@@ -1,0 +1,32 @@
+# Stone is a:
+# 
+# Super-simple data persistence layer created for small applications.
+# 
+# Any class can be made to persist simply by including Stone::Resource
+
+# Here is an example model class
+
+class Author
+  include Stone::Resource
+  
+  field :first_name, String
+  field :last_name, String
+  field :email, String, :format => :email, :mandatory => true
+  
+  field :birthday, String, :format => /d{2}\/d{2}\/d{4}/
+  field :created_at, DateTime, :default => DateTime.now
+  
+  has_many :posts
+  
+  before_save :nervous
+  after_save :whew
+  
+  def nervous
+    puts "Will it save?!?!?!"
+  end
+  
+  def whew
+    puts "Whew. It saved."
+  end
+ 
+end
