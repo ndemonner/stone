@@ -9,13 +9,13 @@
 #
 
 unless Enumerable.method_defined?(:map)   # Ruby 1.4.6
-  module Enumerable
+  module Enumerable #:nodoc:[all]
     alias map collect
   end
 end
 
 unless File.respond_to?(:read)   # Ruby 1.6
-  def File.read(fname)
+  def File.read(fname) #:nodoc:[all]
     open(fname) {|f|
       return f.read
     }
@@ -23,26 +23,26 @@ unless File.respond_to?(:read)   # Ruby 1.6
 end
 
 unless Errno.const_defined?(:ENOTEMPTY)   # Windows?
-  module Errno
-    class ENOTEMPTY
+  module Errno #:nodoc:[all]
+    class ENOTEMPTY #:nodoc:[all]
       # We do not raise this exception, implementation is not needed.
     end
   end
 end
 
-def File.binread(fname)
+def File.binread(fname) #:nodoc:[all]
   open(fname, 'rb') {|f|
     return f.read
   }
 end
 
 # for corrupted Windows' stat(2)
-def File.dir?(path)
+def File.dir?(path) #:nodoc:[all]
   File.directory?((path[-1,1] == '/') ? path : path + '/')
 end
 
 
-class ConfigTable
+class ConfigTable #:nodoc:[all]
 
   include Enumerable
 
@@ -314,7 +314,7 @@ class ConfigTable
     lookup(name).value?
   end
 
-  class Item
+  class Item #:nodoc:[all]
     def initialize(name, template, default, desc)
       @name = name.freeze
       @template = template
@@ -357,7 +357,7 @@ class ConfigTable
     end
   end
 
-  class BoolItem < Item
+  class BoolItem < Item #:nodoc:[all]
     def config_type
       'bool'
     end
@@ -379,7 +379,7 @@ class ConfigTable
     end
   end
 
-  class PathItem < Item
+  class PathItem < Item #:nodoc:[all]
     def config_type
       'path'
     end
@@ -392,13 +392,13 @@ class ConfigTable
     end
   end
 
-  class ProgramItem < Item
+  class ProgramItem < Item #:nodoc:[all]
     def config_type
       'program'
     end
   end
 
-  class SelectItem < Item
+  class SelectItem < Item #:nodoc:[all]
     def initialize(name, selection, default, desc)
       super
       @ok = selection.split('/')
@@ -418,7 +418,7 @@ class ConfigTable
     end
   end
 
-  class ExecItem < Item
+  class ExecItem < Item #:nodoc:[all]
     def initialize(name, selection, desc, &block)
       super name, selection, nil, desc
       @ok = selection.split('/')
@@ -448,7 +448,7 @@ class ConfigTable
     end
   end
 
-  class PackageSelectionItem < Item
+  class PackageSelectionItem < Item #:nodoc:[all]
     def initialize(name, template, default, help_default, desc)
       super name, template, default, desc
       @help_default = help_default
@@ -470,7 +470,7 @@ class ConfigTable
     end
   end
 
-  class MetaConfigEnvironment
+  class MetaConfigEnvironment #:nodoc:[all]
     def initialize(config, installer)
       @config = config
       @installer = installer
@@ -533,7 +533,7 @@ end   # class ConfigTable
 
 
 # This module requires: #verbose?, #no_harm?
-module FileOperations
+module FileOperations #:nodoc:[all]
 
   def mkdir_p(dirname, prefix = nil)
     dirname = prefix + File.expand_path(dirname) if prefix
@@ -686,7 +686,7 @@ end
 
 
 # This module requires: #srcdir_root, #objdir_root, #relpath
-module HookScriptAPI
+module HookScriptAPI #:nodoc:[all]
 
   def get_config(key)
     @config[key]
@@ -748,7 +748,7 @@ module HookScriptAPI
 end
 
 
-class ToplevelInstaller
+class ToplevelInstaller #:nodoc:[all]
 
   Version   = '3.4.1'
   Copyright = 'Copyright (c) 2000-2005 Minero Aoki'
@@ -1021,7 +1021,7 @@ class ToplevelInstaller
 end   # class ToplevelInstaller
 
 
-class ToplevelInstallerMulti < ToplevelInstaller
+class ToplevelInstallerMulti < ToplevelInstaller #:nodoc:[all]
 
   include FileOperations
 
@@ -1155,7 +1155,7 @@ class ToplevelInstallerMulti < ToplevelInstaller
 end   # class ToplevelInstallerMulti
 
 
-class Installer
+class Installer #:nodoc:[all]
 
   FILETYPES = %w( bin lib ext data conf man )
 
@@ -1305,7 +1305,7 @@ class Installer
     end
   end
 
-  class Shebang
+  class Shebang # :nodoc:[all]
     def Shebang.load(path)
       line = nil
       File.open(path) {|f|
@@ -1567,7 +1567,8 @@ class Installer
 end   # class Installer
 
 
-class SetupError < StandardError; end
+class SetupError < StandardError #:nodoc:[all]
+end
 
 def setup_rb_error(msg)
   raise SetupError, msg

@@ -2,12 +2,12 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 
 describe Stone do
   before(:all) do
+    get_resources
+    Stone.build_datastore(STONE_ROOT/"sandbox_for_specs", @resources)
     load_resources
-    empty_sandbox_data
   end
   
   it "should create a new, blank datastore at a given path" do
-    Stone.build_datastore(STONE_ROOT/"sandbox_for_specs", @resources)
     File.exists?(STONE_ROOT/"sandbox_for_specs"/"datastore").should be_true
   end
   

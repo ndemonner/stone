@@ -14,5 +14,6 @@ end
 
 desc "Run specs"
 task :ok do
+  Stone.empty_datastore
   sh "rake specs"
 end

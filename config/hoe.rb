@@ -38,7 +38,7 @@ RDOC_OPTS = ['--quiet', '--title', 'stone documentation',
     "--main", "README",
     "--inline-source"]
 
-class Hoe
+class Hoe # :nodoc:[all]
   def extra_deps 
     @extra_deps.reject! { |x| Array(x).first == 'hoe' } 
     @extra_deps
@@ -58,7 +58,7 @@ $hoe = Hoe.new(GEM_NAME, VERS) do |p|
   
   # == Optional
   p.changes = p.paragraphs_of("History.txt", 0..1).join("\n\n")
-  #p.extra_deps = []     # An array of rubygem dependencies [name, version], e.g. [ ['active_support', '>= 1.3.1'] ]
+  p.extra_deps = [['english', '>= 0.2.0'], ['validatable', '>= 1.6.7'], ['facets', '>= 2.4.1'], ['fastercsv', '>= 1.2.3']]     # An array of rubygem dependencies [name, version], e.g. [ ['active_support', '>= 1.3.1'] ]
   
   #p.spec_extras = {}    # A hash of extra values to set in the gemspec.
   
