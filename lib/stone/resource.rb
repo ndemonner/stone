@@ -1,4 +1,3 @@
-# test
 module Stone
   
   # Adds the ability to persist any class it is included in
@@ -13,7 +12,6 @@ module Stone
   module Resource
     
     class << self
-      
       def included(base)
         base.send(:extend, self)
         base.send(:include, ::Validatable)
@@ -37,7 +35,7 @@ module Stone
     
     @@fields = {}
     
-    # Adds a given field to +@@fields+ and inserts an accessor for that
+    # Adds a given field to @@fields and inserts an accessor for that
     # field into klass
     # === Parameters
     # +name+<String>::
@@ -128,7 +126,7 @@ module Stone
     #   A string representing one or more Ruby expressions
     # === Example
     # <tt>Author.first("name ~= /Nick/i && email.include?('gmail.com')")</tt>
-    def first(conditions)
+    def first(conditions = nil)
       objs = []
       unless conditions
         return @@store.resources[self.to_s.make_key].first[1]
@@ -143,7 +141,7 @@ module Stone
     # +conditions+::
     #   A string representing one or more Ruby expressions
     # === Example
-    # <tt>Author.all("name ~= /Nick/i && email.include?('gmail.com')")</tt>
+    # <tt>Author.all("created_at < DateTime.now")</tt>
     def all(conditions = nil)
       objs = []
       unless conditions
@@ -153,6 +151,7 @@ module Stone
       else
         objs = find(conditions, self.to_s.make_key)
       end
+      objs
     end
     
     # Synonymous for get
