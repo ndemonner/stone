@@ -27,13 +27,16 @@ module Stone
       #   The instantiated resource to be saved
       # +store+:: 
       #   DataStore object
-      def determine_put_or_post(obj, store)
-        store.resources[obj.class.to_s.downcase.to_sym].each do |o|
+      def determine_save_method(obj, store)
+        store.resources[obj.class.to_s.make_key].each do |o|
           return :put if o[0] == obj.id
         end
-        return :post
+        :post
       end
       
+      # Persist the object via YAML
+      # === Parameters
+      # +obj+:: The object to be persisted
       def write_yaml(obj)
         path = Stone.local_dir/obj.class.to_s.downcase.pluralize/"#{obj.id}.yml"
         File.open(path, 'w') do |out|
