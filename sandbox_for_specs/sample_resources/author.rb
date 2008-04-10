@@ -9,11 +9,16 @@ class Author #:nodoc:
   validates_presence_of :name, :email
   
   before_save :cap_name
+  before_save :give_random_number
   
   has_many :posts
   has_many :comments
   
   def cap_name
     self.name = self.name.titlecase
+  end
+  
+  def give_random_number
+    self.favorite_number = rand(50)+1 unless self.favorite_number
   end
 end

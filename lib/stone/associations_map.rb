@@ -1,5 +1,5 @@
 module Stone
-  class AssociationMap
+  class AssociationsMap
     
   end
 end

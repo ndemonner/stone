@@ -91,4 +91,23 @@ describe Stone::Resource do
     @author.save
     Author.first("favorite_number == 3").should be_instance_of Author
   end
+  
+  it "should perform a put if the object already exists on save" do
+    author = Author.first("name == 'Nick DeMonner'")
+    author.email = "nick@bzzybee.com"
+    author.save
+    Author.get(author.id).email.should == "nick@bzzybee.com" 
+  end
+  
+  it "should delete an object and it's yaml file upon Resource.delete" do
+    author = Author.first("favorite_number == 3")
+    Author.delete(author.id).should be_true
+  end
+  
+  it "should execute Resource callbacks" do
+    @author.name = "ben hurr"
+    @author.email = "chariot_guy@hotmail.com"
+    @author.save
+    @author.name.should == "Ben Hurr"
+  end
 end

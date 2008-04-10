@@ -25,7 +25,10 @@ module Stone
         end
         
         rsrc_sym = base.to_s.make_key
-        @@map ||= AssociationMap.new
+        @@callbacks ||= Callbacks.new
+        @@callbacks.register_klass(base)
+        
+        @@map ||= AssociationsMap.new
         @@store ||= DataStore.new
         unless @@store.resources.include? rsrc_sym
           @@store.resources[rsrc_sym] = DataStore.load_data(rsrc_sym)
@@ -73,22 +76,39 @@ module Stone
     def validates_uniqueness_of(field)s
     end
     
-    def before_save(meth, *args)
+    # Registers the given method with the current instance of Callbacks. Upon
+    # activation (in this case, right before Resource.save is executed), the
+    # +meth+ given is called against the object begin, in this case, saved.
+    # === Parameters
+    # +meth+:: The method to be registered
+    def before_save(meth)
+      @@callbacks.register(:before_save, meth, self)
     end
     
-    def before_destroy(meth, *args) 
+    # See before_save
+    def after_save(meth)
+      @@callbacks.register(:after_save, meth, self)
     end
     
-    def before_create(meth, *args)
+    
+    # See before_save
+    def before_create(meth)
+      @@callbacks.register(:before_create, meth, self)
     end
     
-    def after_save(meth, *args)
+    # See before_save
+    def after_create(meth)
+      @@callbacks.register(:after_create, meth, self)
     end
     
-    def after_create(meth, *args)
+    # See before_save
+    def before_delete(meth) 
+      @@callbacks.register(:before_delete, meth, self)
     end
     
-    def after_destroy(meth, *args)
+    # See before_save
+    def after_delete(meth)
+      @@callbacks.register(:after_delete, meth, self)
     end
     
     def has_many(resource, *args)
@@ -103,12 +123,18 @@ module Stone
     def has_and_belongs_to_many(resource, *args)
     end
     
+    # Save an object to the current DataStore instance.
     def save
-      return false unless self.valid? && self.fields_are_valid?
+      return false unless self.fields_are_valid?
+      fire(:before_save)
+      return false unless self.valid?
       sym = DataStore.determine_save_method(self, @@store)
       self.class.send(sym, self)
+      fire(:after_save)
     end
     
+    # Determines whether the field classes of a given object match the field
+    # class declarations
     def fields_are_valid?
       klass_sym = self.class.to_s.make_key
       @@fields[klass_sym].each do |field|
@@ -167,13 +193,24 @@ module Stone
       @@fields
     end
     
+    # Deletes the object with +id+ from the current DataStore instance and
+    # its corresponding yaml file
     def delete(id)
+      fire(:before_delete)
+      DataStore.delete(id, self.to_s.downcase.pluralize)
+      @@store.resources[self.to_s.make_key].each_with_index do |o,i|
+        @@store.resources[self.to_s.make_key].delete_at(i) if o[0] == id
+      end
+      fire(:after_delete)
+      true
     end
     
-    # Allow for retrieval of an object in the @@store by id
+    # Allow for retrieval of an object in the current DataStore instance by id
     # === Parameters
     # +id+:: id of the object to retrieve 
     def get(id)
+      raise "Expected Fixnum, got #{id.class} for #{self.to_s}.get" \
+        unless id.class == Fixnum
       @@store.resources[self.to_s.make_key].each do |o|
         return o[1] if o[0] == id
       end
@@ -194,22 +231,47 @@ module Stone
     end
 
     private
+    
+    # Fires the given callback in the current instance of Callbacks
+    # === Parameters
+    # +cb_sym+:: The symbol for the callback (e.g. :before_save)
+    def fire(cb_sym)
+      @@callbacks.fire(cb_sym, self)
+      true
+    end
+    
+    # Creates a yaml file for +obj+ and adds +obj+ to the current DataStore
+    # instance
+    # === Parameters
+    # +obj+:: The object to be saved
     def post(obj)
+      fire(:before_create)
       obj.created_at = DateTime.now if field_declared?(:created_at,obj.class)
       obj.updated_at = DateTime.now if field_declared?(:updated_at,obj.class)
       DataStore.write_yaml(obj)
       @@store.resources[obj.class.to_s.make_key] << [obj.id, obj]
-      true
+      fire(:after_create)
     end
-
-    def put(id, obj)
+    
+    # Updates the yaml file for +obj+ and overwrites the old object in the
+    # the current DataStore instance
+    # === Parameters
+    # 
+    def put(obj)
+      obj.updated_at = DateTime.now if field_declared?(:updated_at,obj.class)
+      DataStore.write_yaml(obj)
+      @@store.resources[obj.class.to_s.make_key].each do |o|
+        o[1] = obj if o[0] == obj.id
+      end
+      true
     end
     
     # Find an object according to +conditions+ provided
     # === Parameters
     # +conditions+:: A plain string representation of a set of conditions
     # +key+:: 
-    #   A symbol representing the class of objects to look for in +@@store+
+    #   A symbol representing the class of objects to look for in the current
+    #   DataStore instance
     def find(conditions, key) #:doc:
       objs = []
       parsed_conditions = parse_conditions(conditions)

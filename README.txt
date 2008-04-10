@@ -4,7 +4,7 @@
 
 == DESCRIPTION:
 
-Super-simple data persistence layer created for small applications.
+Plug and play data persistence layer created for small applications.
 
 == FEATURES/PROBLEMS:
 

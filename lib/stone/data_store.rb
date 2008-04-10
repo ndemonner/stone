@@ -43,6 +43,18 @@ module Stone
           YAML.dump(obj, out)
         end
       end
+      
+      # Removes object's yaml file
+      # === Parameters
+      # +id+:: id of the object to be removed
+      # +klass_dir+:: directory in which object resides
+      def delete(id, klass_dir)
+        raise "Object could not be found" \
+          unless File.exists?(Stone.local_dir/klass_dir/"#{id}.yml")
+            
+        FileUtils.remove_file(Stone.local_dir/klass_dir/"#{id}.yml")
+        true
+      end
     end # self
     
     def initialize
