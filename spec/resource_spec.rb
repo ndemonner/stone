@@ -31,9 +31,6 @@ describe Stone::Resource do
   end
   
   it "should be invalid when a field's class does not match its declaration" do
-    # Field was declared in resource as:
-    # field :author, String
-    
     @author.name = 3
     @author.email = "nick@cladby.com"
     @author.save.should_not be_true
@@ -89,7 +86,7 @@ describe Stone::Resource do
     @author.email = "higglebear@higgly.com"
     @author.favorite_number = 3
     @author.save
-    Author.first("favorite_number == 3").should be_instance_of Author
+    Author.first("favorite_number == 3").should be_instance_of(Author)
   end
   
   it "should perform a put if the object already exists on save" do
@@ -109,5 +106,31 @@ describe Stone::Resource do
     @author.email = "chariot_guy@hotmail.com"
     @author.save
     @author.name.should == "Ben Hurr"
+  end
+  
+  it "should not save if there is a duplicate and the field is unique" do
+    @author.name = "John Doe"
+    @author.email = "nick@bzzybee.com"
+    @author.save.should_not be_true
+  end
+  
+  it "should retrieve a parent object if belongs_to has been set" do
+    @post = Post.new
+    @post.title = "Stone is Cool"
+    @post.body = "Stone is cool because..."
+    author = Author.first("name == 'Nick DeMonner'")
+    @post.author_id = author.id
+    @post.save
+    @post.author.should be_instance_of(Author)
+  end
+  
+  it "should retrieve children objects id has_many has been set" do
+    @post = Post.new
+    @post.title = "Stone is Awesome"
+    @post.body = "Stone is awesome because..."
+    author = Author.first("name == 'Nick DeMonner'")
+    @post.author_id = author.id
+    @post.save
+    author.posts.size.should == 2
   end
 end

@@ -28,7 +28,6 @@ module Stone
         @@callbacks ||= Callbacks.new
         @@callbacks.register_klass(base)
         
-        @@map ||= AssociationsMap.new
         @@store ||= DataStore.new
         unless @@store.resources.include? rsrc_sym
           @@store.resources[rsrc_sym] = DataStore.load_data(rsrc_sym)
@@ -43,12 +42,23 @@ module Stone
     # === Parameters
     # +name+<String>::
     #    
-    def field(name, klass, *args)
+    def field(name, klass, arg = nil)
+      
+      if arg && arg[:unique] == true
+        unique = true
+      else
+        unique = false
+      end
+      
       klass_sym = self.to_s.make_key
       unless @@fields[klass_sym]
-        @@fields[klass_sym] = [{:name => name, :klass => klass}]
+        @@fields[klass_sym] = [{:name => name, 
+                                :klass => klass, 
+                                :unique => unique}]
       else
-        @@fields[klass_sym] << {:name => name, :klass => klass}
+        @@fields[klass_sym] << {:name => name, 
+                                :klass => klass, 
+                                :unique => unique}
       end
       
       name = name.to_s
@@ -72,13 +82,9 @@ module Stone
       @id
     end
     
-    # hmmmm, this is a tricky one...
-    def validates_uniqueness_of(field)s
-    end
-    
     # Registers the given method with the current instance of Callbacks. Upon
     # activation (in this case, right before Resource.save is executed), the
-    # +meth+ given is called against the object begin, in this case, saved.
+    # +meth+ given is called against the object being, in this case, saved.
     # === Parameters
     # +meth+:: The method to be registered
     def before_save(meth)
@@ -111,15 +117,35 @@ module Stone
       @@callbacks.register(:after_delete, meth, self)
     end
     
+    # Registers a has_many relationship for +resource+
+    # === Parameters
+    # +resource+::
+    #   the resource of which this class has many
     def has_many(resource, *args)
+      self.class_eval <<-EOS, __FILE__, __LINE__
+        def #{resource.to_s} 
+          #{resource.to_s.singularize.titlecase}.all("#{self.to_s.downcase}_id == "+self.id.to_s)
+        end
+      EOS
     end
     
     def has_one(resource, *args)
+      field "#{resource.to_s}_id".to_sym, Fixnum
     end
     
+    # Registers a belongs_to relationship for resource
+    # === Parameters
+    # +resource+ :: The resource to which this class belongs
     def belongs_to(resource, *args)
+      field "#{resource.to_s}_id".to_sym, Fixnum
+      self.class_eval <<-EOS, __FILE__, __LINE__
+        def #{resource.to_s} 
+          #{resource.to_s.titlecase}[self.#{resource.to_s}_id]
+        end
+      EOS
     end
     
+    # TODO: implement this
     def has_and_belongs_to_many(resource, *args)
     end
     
@@ -141,6 +167,9 @@ module Stone
         unless self.send(field[:name]).class == field[:klass] || self.send(field[:name]) == nil
           return false 
         end
+        if field[:unique] == true
+          return false if self.class.first("#{field[:name]} == '#{self.send(field[:name])}'")
+        end
       end
       true
     end
@@ -153,7 +182,6 @@ module Stone
     # === Example
     # <tt>Author.first("name ~= /Nick/i && email.include?('gmail.com')")</tt>
     def first(conditions = nil)
-      objs = []
       unless conditions
         return @@store.resources[self.to_s.make_key].first[1]
       else

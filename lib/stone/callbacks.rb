@@ -19,7 +19,6 @@ module Stone
     # +klass+:: The class to be registered
     def register_klass(klass)
       self[klass.to_s.make_key] = {}
-    
       CALLBACKS.each do |cb_sym|
         self[klass.to_s.make_key][cb_sym] = []
       end

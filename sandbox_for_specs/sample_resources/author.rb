@@ -2,7 +2,7 @@ class Author #:nodoc:
   include Stone::Resource
   
   field :name, String
-  field :email, String
+  field :email, String, :unique => true
   field :favorite_number, Fixnum
   field :created_at, DateTime
 
