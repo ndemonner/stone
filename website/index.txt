@@ -85,11 +85,11 @@ h3. Get, Post, Put, and Delete
   Author.first(:name => "Nick DeMonner")
   
   # brings back first author whose name contains "Nick"
-  Author.first("name.include?('Nick')")
+  Author.first(:name.includes => 'Nick')
   
   # brings back all authors whose email contains "gmail.com", and who 
-  # were created before some_date_time
-  Author.all("email.include?('gmail.com') && created_at < some_date_time")
+  # were created before today
+  Author.all(:email.includes => "gmail.com", :created_at.lt => DateTime.now)
 </pre>
 
 * Posting
@@ -115,21 +115,43 @@ h3. Get, Post, Put, and Delete
 
 h3. A Word About Finding Stuff
 
-You'll note that Stone uses a string containing ruby expressions to find
-your data. Any method works here, just be careful when inserting values.
+Stone uses a series of unique methods (à la DataMapper) to finding objects. 
+You may use the following methods when searching:
 
-* This...
-<pre syntax="ruby">
-  Author.first("name == #{name}")
-</pre>
-...won't work.
+* <pre syntax="ruby">
+    # matches all objects whose <code>field</code> is greater 
+    # than <code>thing</code>
+    :field.gt => thing
+  </pre>
 
-* Instead, use this...
-<pre syntax="ruby">
-  Author.first("name == '#{name}'")
-</pre>
-... and your luck will change.
+* <pre syntax="ruby">
+    # matches objects whose <code>field</code> is greater than 
+    # or equal to <code>thing</code>
+    :field.gte => thing
+  </pre>
 
+* <pre syntax="ruby">
+    # matches all objects whose <code>field</code> is less 
+    # than <code>thing</code>
+    :field.lt => thing
+  </pre>
+
+* <pre syntax="ruby">
+    # matches all objects whose <code>field</code> is less than
+    # or equal to <code>thing</code>
+    :field.lte => thing
+  </pre>
+
+* <pre syntax="ruby">
+    # matches all objects whose <code>field</code> contains <code>thing</code>
+    :field.includes => thing
+  </pre>
+
+* <pre syntax="ruby">
+    # matches objects whose <code>field</code> matches <code>pattern</code>
+    :field.matches => pattern   # pattern is any RegEx
+  </pre>
+  
 h2. License
 
 This code is free to use under the terms of the MIT license. 

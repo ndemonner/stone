@@ -9,7 +9,9 @@ config/requirements.rb
 lib/stone.rb
 lib/stone/callbacks.rb
 lib/stone/core_ext/string.rb
+lib/stone/core_ext/symbol.rb
 lib/stone/data_store.rb
+lib/stone/query.rb
 lib/stone/resource.rb
 lib/stone/utilities.rb
 lib/stone/version.rb

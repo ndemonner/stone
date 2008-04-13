@@ -137,7 +137,7 @@ module Stone
     def has_many(resource, *args)
       self.class_eval <<-EOS, __FILE__, __LINE__
         def #{resource.to_s} 
-          #{resource.to_s.singularize.titlecase}.all("#{self.to_s.downcase}_id == "+self.id.to_s)
+          #{resource.to_s.singularize.titlecase}.all("#{self.to_s.downcase}_id".to_sym.equals => self.id)
         end
       EOS
     end
@@ -233,6 +233,9 @@ module Stone
       false
     end
     
+    # Puts the attribute changes in +hash+
+    # === Parameters
+    # +hash+:: the attributes to change
     def update_attributes(hash)
       hash.each_key do |k|
         if hash[k].is_a? Hash
@@ -278,12 +281,13 @@ module Stone
           return false 
         end
         if field[:unique] == true
-          return false if self.class.first("#{field[:name]} == '#{self.send(field[:name])}'") && !self.already_exists?
+          return false if self.class.first(field[:name] => self.send(field[:name])) && !self.already_exists?
         end
       end
       true
     end
     
+    # Finds out if the object is already in the current DataStore instance
     def already_exists?
       DataStore.determine_save_method(self, @@store) == :put
     end
@@ -332,22 +336,30 @@ module Stone
     #   DataStore instance
     def find(conditions, key) #:doc:
       objs = []
+    
       if conditions.is_a? Hash
-        raise "Resource.find(Hash) expects a single key, value pair" \
-          unless conditions.size == 1
-        conds = conditions.to_a.flatten
-        @@store.resources[key].each do |o|
-          objs << o[1] if o[1].send(conds[0]) == conds[1]
+        unless conditions.to_a.flatten.map {|e| e.is_a? Query}.include?(true)
+          conds = conditions.to_a.flatten
+          @@store.resources[key].each do |o|
+            objs << o[1] if o[1].send(conds[0]) == conds[1]
+          end
+        else
+          parsed_conditions = parse_conditions(conditions)
+          @@store.resources[key].each do |o|
+            objs << o[1] if matches_conditions?(o[1], parsed_conditions)
+          end
         end
       else
-        parsed_conditions = parse_conditions(conditions)
-        @@store.resources[key].each do |o|
-          objs << o[1] if matches_conditions?(o[1], parsed_conditions)
-        end
+        raise "Resource.find expects a Hash, got a #{conditions.class}"
       end
       objs
     end
     
+    # Checks the list of fields for a given +klass+ to see if +field+
+    # is included
+    # === Parameters
+    # +field+:: The field to look for
+    # +klass+:: The class to look in 
     def field_declared?(field,klass)
       @@fields[klass.to_s.make_key].each do |f|
         return true if f[:name] == field
@@ -381,43 +393,15 @@ module Stone
       eval(tf_ary.join)
     end
     
-    # Accepts +conditions+ like 
-    # "name.include?('nick') && email == 'nick@bzzybee.com"
-    # and turns them into an +ary+ of expressions and their conditionals
-    # === Parameters
-    # +conditions+:: The plain string conditions
-    def parse_conditions(conditions) #:doc:
-      ary = []
-      # Facets breaks for some reason on single condition expressions
-      # e.g. "name == 'Nick DeMonner'"
-      # but not on multiple ones like
-      # "name == 'Nick DeMonner' && blah.include?('blah')"
-      begin
-        expr = conditions.split(/\s+&{2}|\|{2}\s+/)
-      rescue
-        expr = [conditions]
+    # Turns conditions into a set of expressions that can be evaluated
+    def parse_conditions(hash)
+      conds = []
+      hash.each do |k,v|
+        conds << k.expression_for(v)
+        conds << "&&"
       end
-      op = conditions.scan(/&{2}|\|{2}/)
-      expr.each_with_index do |e,i|
-        ary << e.strip
-        ary << op[i] if op[i]
-      end
-      # convert each expr into an obj.meth(arg) format
-      # so that name == 'nick' becomes name.==('nick')
-      ary.each_with_index do |e,i|
-        if i % 2 == 0 && e.split.size != 1 && !e.match(/.+(.+)/)
-          expr_ary = e.split
-          expr_ary[0] = expr_ary[0] + "."
-          expr_ary[1] = expr_ary[1] + "("
-          if expr_ary.size % 2 == 0
-            expr_ary[expr_ary.size-1] = " " + expr_ary[expr_ary.size-1] + ")"
-          else
-            expr_ary[expr_ary.size-1] = expr_ary[expr_ary.size-1] + ")"
-          end
-          ary[i] = expr_ary.join
-        end
-      end
-      ary
+      conds.pop
+      conds
     end
   end # Resource
   

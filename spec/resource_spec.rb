@@ -69,28 +69,23 @@ describe Stone::Resource do
   
   it "should accept Resource.find(hash) form" do
     author = Author.first(:name => "Nick DeMonner")
-    author.should be_instance_of Author
+    author.should be_instance_of(Author)
   end
   
-  it "should raise an exception if more than one key, value pair are used in find" do
-    lambda {Author.first(:name => "Nick DeMonner", :email => "nick@cladby.com")}.should raise_error
+  it "should raise an exception anything other than a Hash is provided for find" do
+    lambda {Author.first("Nick")}.should raise_error
   end
   
   it "should find and return all objects that match conditions provided" do
-    @author.name = "Bob Hicklesby"
-    @author.email = "bob@gmail.com"
+    @author.name = "Nick Hicklesby"
+    @author.email = "nick@gmail.com"
     @author.save
-    people = Author.all("name == 'Nick DeMonner' || email.include?('gmail')")
+    people = Author.all(:name.includes => "Nick")
     people.size.should == 2
   end
   
-  it "should accept cool methods for searching" do
-    people = Author.all("name.include?('Nick DeMonner')")
-    people.size.should == 1
-  end
-  
   it "should find and return the first object that matches conditions provided" do
-    person = Author.first("name == 'Nick DeMonner'")
+    person = Author.first(:name.equals => 'Nick DeMonner')
     person.id.should == 1
   end
   
@@ -99,18 +94,18 @@ describe Stone::Resource do
     @author.email = "higglebear@higgly.com"
     @author.favorite_number = 3
     @author.save
-    Author.first("favorite_number == 3").should be_instance_of(Author)
+    Author.first(:favorite_number.equals => 3).should be_instance_of(Author)
   end
   
   it "should perform a put if the object already exists on save" do
-    author = Author.first("name == 'Nick DeMonner'")
+    author = Author.first(:name.equals => 'Nick DeMonner')
     author.email = "nick@bzzybee.com"
     author.save
     Author.get(author.id).email.should == "nick@bzzybee.com" 
   end
   
   it "should delete an object and it's yaml file upon Resource.delete" do
-    author = Author.first("favorite_number == 3")
+    author = Author.first(:favorite_number.equals => 3)
     Author.delete(author.id).should be_true
   end
   
@@ -131,7 +126,7 @@ describe Stone::Resource do
     @post = Post.new
     @post.title = "Stone is Cool"
     @post.body = "Stone is cool because..."
-    author = Author.first("name == 'Nick DeMonner'")
+    author = Author.first(:name.equals => 'Nick DeMonner')
     @post.author_id = author.id
     @post.save
     @post.author.should be_instance_of(Author)
@@ -141,7 +136,7 @@ describe Stone::Resource do
     @post = Post.new
     @post.title = "Stone is Awesome"
     @post.body = "Stone is awesome because..."
-    author = Author.first("name == 'Nick DeMonner'")
+    author = Author.first(:name.equals => 'Nick DeMonner')
     @post.author_id = author.id
     @post.save
     author.posts.size.should == 2
