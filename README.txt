@@ -4,23 +4,28 @@
 
 == DESCRIPTION:
 
-Plug and play data persistence layer created for small applications.
+For small applications, a database can be overkill for storing your data in a consistent and
+organized manner. Therefore, Stone was built to provide plug-and-play data persistence for 
+any application or framework. It is fast, and it is easy... it is good.
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+* This is the 0.0.1 release so lots and lots of stuff to do.
 
 == SYNOPSIS:
 
-  FIX (code sample of usage)
+  include Stone::Resource for persistence of any object
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+* English
+* Facets
+* Validatable
+* Fastercsv (for csv exporting/importing)
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+* sudo gem install stone
 
 == LICENSE:
 
