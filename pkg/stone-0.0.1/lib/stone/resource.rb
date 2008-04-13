@@ -13,23 +13,36 @@ module Stone
     
     class << self
       def included(base)
+        rsrc_sym = base.to_s.make_key
+        
+        @@callbacks ||= Callbacks.new
+        @@callbacks.register_klass(base)
+        
+        @@store ||= DataStore.new
+        
         base.send(:extend, self)
         base.send(:include, ::Validatable)
         
         unless base.to_s.downcase == "spec::example::examplegroup::subclass_1"
           base.class_eval <<-EOS, __FILE__, __LINE__
-            def initialize
+            def initialize(hash = nil)
               self.id = self.next_id_for_klass(self.class)
+              unless hash.blank?
+                hash.each_key do |k|
+                  if hash[k].is_a? Hash
+                    hash[k].each do |k,v|
+                      self.send(k.to_s+"=",v)
+                    end
+                  else
+                    self.send(k.to_s+"=", hash[k])
+                  end
+                end
+              end
             end
           EOS
         end
         
-        rsrc_sym = base.to_s.make_key
-        @@callbacks ||= Callbacks.new
-        @@callbacks.register_klass(base)
-        
-        @@store ||= DataStore.new
-        unless @@store.resources.include? rsrc_sym
+        unless @@store.resources.include?(rsrc_sym)
           @@store.resources[rsrc_sym] = DataStore.load_data(rsrc_sym)
         end
       end
@@ -149,31 +162,6 @@ module Stone
     def has_and_belongs_to_many(resource, *args)
     end
     
-    # Save an object to the current DataStore instance.
-    def save
-      return false unless self.fields_are_valid?
-      fire(:before_save)
-      return false unless self.valid?
-      sym = DataStore.determine_save_method(self, @@store)
-      self.class.send(sym, self)
-      fire(:after_save)
-    end
-    
-    # Determines whether the field classes of a given object match the field
-    # class declarations
-    def fields_are_valid?
-      klass_sym = self.class.to_s.make_key
-      @@fields[klass_sym].each do |field|
-        unless self.send(field[:name]).class == field[:klass] || self.send(field[:name]) == nil
-          return false 
-        end
-        if field[:unique] == true
-          return false if self.class.first("#{field[:name]} == '#{self.send(field[:name])}'")
-        end
-      end
-      true
-    end
-    
     # Returns the first object matching +conditions+, or the first object
     # if no conditions are specified
     # === Parameters
@@ -245,6 +233,19 @@ module Stone
       false
     end
     
+    def update_attributes(hash)
+      hash.each_key do |k|
+        if hash[k].is_a? Hash
+          hash[k].each do |k,v|
+            self.send(k.to_s+"=",v)
+          end
+        else
+          self.send(k.to_s+"=", hash[k])
+        end
+      end
+      self.save
+    end
+    
     # Determine the next id number to use based on the last stored object's id
     # of class +klass+
     # === Parameters
@@ -257,7 +258,36 @@ module Stone
         return 1
       end
     end
-
+    
+    # Save an object to the current DataStore instance.
+    def save
+      return false unless self.fields_are_valid?
+      fire(:before_save)
+      return false unless self.valid?
+      sym = DataStore.determine_save_method(self, @@store)
+      self.class.send(sym, self)
+      fire(:after_save)
+    end
+    
+    # Determines whether the field classes of a given object match the field
+    # class declarations
+    def fields_are_valid?
+      klass_sym = self.class.to_s.make_key
+      @@fields[klass_sym].each do |field|
+        unless self.send(field[:name]).class == field[:klass] || self.send(field[:name]) == nil || self.already_exists?
+          return false 
+        end
+        if field[:unique] == true
+          return false if self.class.first("#{field[:name]} == '#{self.send(field[:name])}'") && !self.already_exists?
+        end
+      end
+      true
+    end
+    
+    def already_exists?
+      DataStore.determine_save_method(self, @@store) == :put
+    end
+    
     private
     
     # Fires the given callback in the current instance of Callbacks
@@ -302,9 +332,18 @@ module Stone
     #   DataStore instance
     def find(conditions, key) #:doc:
       objs = []
-      parsed_conditions = parse_conditions(conditions)
-      @@store.resources[key].each do |o|
-        objs << o[1] if matches_conditions?(o[1], parsed_conditions)
+      if conditions.is_a? Hash
+        raise "Resource.find(Hash) expects a single key, value pair" \
+          unless conditions.size == 1
+        conds = conditions.to_a.flatten
+        @@store.resources[key].each do |o|
+          objs << o[1] if o[1].send(conds[0]) == conds[1]
+        end
+      else
+        parsed_conditions = parse_conditions(conditions)
+        @@store.resources[key].each do |o|
+          objs << o[1] if matches_conditions?(o[1], parsed_conditions)
+        end
       end
       objs
     end

@@ -43,7 +43,7 @@
 
 	<p>For small applications, a database can be overkill for storing your data in a consistent and
 organized manner. Therefore, Stone was built to provide plug-and-play data persistence for 
-any application or framework. It is fast, and it is easy&#8230; it is good.</p>
+any application or framework. It is fast, and it is easy&#8230; therefore it is good.</p>
 
 
 	<h2>Installing</h2>
@@ -67,7 +67,7 @@ any application or framework. It is fast, and it is easy&#8230; it is good.</p>
 <pre class='syntax'>
   <span class="ident">require</span> <span class="punct">'</span><span class="string">stone</span><span class="punct">'</span>
   
-  <span class="constant">Stone</span><span class="punct">.</span><span class="ident">start</span><span class="punct">(</span><span class="constant">Dir</span><span class="punct">.</span><span class="ident">pwd</span><span class="punct">,</span> <span class="constant">Dir</span><span class="punct">.</span><span class="ident">glob</span><span class="punct">(</span><span class="constant">File</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(</span><span class="constant">Dir</span><span class="punct">.</span><span class="ident">pwd</span><span class="punct">,&quot;</span><span class="string">app/models/*</span><span class="punct">&quot;)))</span>
+  <span class="constant">Stone</span><span class="punct">.</span><span class="ident">start</span><span class="punct">(</span><span class="constant">Dir</span><span class="punct">.</span><span class="ident">pwd</span><span class="punct">,</span> <span class="constant">Dir</span><span class="punct">.</span><span class="ident">glob</span><span class="punct">(</span><span class="constant">File</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(</span><span class="constant">Dir</span><span class="punct">.</span><span class="ident">pwd</span><span class="punct">,&quot;</span><span class="string">app/models/*</span><span class="punct">&quot;)),</span> <span class="symbol">:rails</span><span class="punct">)</span>
 </pre></li>
 	</ul>
 
@@ -88,7 +88,7 @@ any application or framework. It is fast, and it is easy&#8230; it is good.</p>
 <pre class='syntax'>
   <span class="ident">require</span> <span class="punct">'</span><span class="string">stone</span><span class="punct">'</span>
   
-  <span class="constant">Stone</span><span class="punct">.</span><span class="ident">start</span><span class="punct">(</span><span class="constant">Dir</span><span class="punct">.</span><span class="ident">pwd</span><span class="punct">,</span> <span class="constant">Dir</span><span class="punct">.</span><span class="ident">glob</span><span class="punct">(</span><span class="constant">File</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(</span><span class="constant">Dir</span><span class="punct">.</span><span class="ident">pwd</span><span class="punct">,&quot;</span><span class="string">app/models/*</span><span class="punct">&quot;)))</span>
+  <span class="constant">Stone</span><span class="punct">.</span><span class="ident">start</span><span class="punct">(</span><span class="constant">Dir</span><span class="punct">.</span><span class="ident">pwd</span><span class="punct">,</span> <span class="constant">Dir</span><span class="punct">.</span><span class="ident">glob</span><span class="punct">(</span><span class="constant">File</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(</span><span class="constant">Dir</span><span class="punct">.</span><span class="ident">pwd</span><span class="punct">,&quot;</span><span class="string">app/models/*</span><span class="punct">&quot;)),</span> <span class="symbol">:merb</span><span class="punct">)</span>
 </pre></li>
 	</ul>
 
@@ -149,6 +149,9 @@ your data gets persisted to files within <code>myapp/datastore/</code>.</p>
   <span class="constant">Author</span><span class="punct">.</span><span class="ident">get</span><span class="punct">(</span><span class="ident">some_id</span><span class="punct">)</span>             <span class="comment"># gets Author with some_id</span>
   <span class="constant">Author</span><span class="punct">[</span><span class="ident">some_id</span><span class="punct">]</span>                 <span class="comment"># same as get()</span>
   
+  <span class="comment"># brings back first author whose name is &quot;Nick DeMonner&quot;</span>
+  <span class="constant">Author</span><span class="punct">.</span><span class="ident">first</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Nick DeMonner</span><span class="punct">&quot;)</span>
+  
   <span class="comment"># brings back first author whose name contains &quot;Nick&quot;</span>
   <span class="constant">Author</span><span class="punct">.</span><span class="ident">first</span><span class="punct">(&quot;</span><span class="string">name.include?('Nick')</span><span class="punct">&quot;)</span>
   
@@ -173,10 +176,10 @@ your data gets persisted to files within <code>myapp/datastore/</code>.</p>
 	<li>Putting
 <pre class='syntax'>
   <span class="ident">author</span> <span class="punct">=</span> <span class="constant">Author</span><span class="punct">[</span><span class="ident">some_id</span><span class="punct">]</span>        <span class="comment"># gets Author with id of some_id</span>
-  <span class="ident">author</span><span class="punct">.</span><span class="ident">name</span>                     <span class="comment"># =&gt; &quot;Nick DeMonner&quot;</span>
   
-  <span class="ident">author</span><span class="punct">.</span><span class="ident">name</span> <span class="punct">=</span> <span class="punct">&quot;</span><span class="string">Bob Bobberson</span><span class="punct">&quot;</span>   <span class="comment"># changes name</span>
-  <span class="ident">author</span><span class="punct">.</span><span class="ident">save</span>                     <span class="comment"># calls Author.put after validations</span>
+  <span class="comment"># updates name and calls Resource.save (which in turn calls Resource.put </span>
+  <span class="comment"># because this resource is being updated, not created)</span>
+  <span class="ident">author</span><span class="punct">.</span><span class="ident">update_attributes</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Bob Bobberson</span><span class="punct">&quot;)</span>
 </pre></li>
 	</ul>
 
@@ -223,7 +226,7 @@ your data. Any method works here, just be careful when inserting values.</p>
 	<h2>Contributing</h2>
 
 
-	<p><span class="caps">PLEASE</span>. Stone is extremely immature at this point, and so &#8220;stable&#8221; is
+	<p><span class="caps">PLEASE</span>. Stone is extremely immature at this point&#8212;&#8220;stable&#8221; is
 the watchword for the moment.</p>
 
 
@@ -248,7 +251,7 @@ commit. =D</p>
 
 	<p>Comments are welcome. Join me in the <span class="caps">IRC</span> channel #stone on freenode.</p>
     <p class="coda">
-      Nick DeMonner, 12th April 2008<br>
+      Nick DeMonner, 13th April 2008<br>
       Theme extended from <a href="http://rb2js.rubyforge.org/">Paul Battley</a>
     </p>
 </div>

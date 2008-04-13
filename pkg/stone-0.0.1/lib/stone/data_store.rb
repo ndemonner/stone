@@ -3,12 +3,23 @@ module Stone
   class DataStore
     
     class << self
+      @dir ||= ""
+      
+      def local_dir=(value) #:nodoc:
+        @dir = value
+      end
+
+      # Provides the directory path to the local (app-specific) datastore
+      def local_dir
+        @dir || Dir.pwd/"datastore"
+      end
+      
       # Loads yaml files specific to the resource represented by +sym+
       # === Parameters
       # +sym+::
       #   Symbol representing resource data to load
       def load_data(sym)
-        dir = Stone.local_dir
+        dir = self.local_dir
         ymls = Dir.glob(dir/sym.to_s.pluralize/"*.yml")
         objs = []
         unless ymls.empty?
@@ -38,7 +49,7 @@ module Stone
       # === Parameters
       # +obj+:: The object to be persisted
       def write_yaml(obj)
-        path = Stone.local_dir/obj.class.to_s.downcase.pluralize/"#{obj.id}.yml"
+        path = self.local_dir/obj.class.to_s.downcase.pluralize/"#{obj.id}.yml"
         File.open(path, 'w') do |out|
           YAML.dump(obj, out)
         end
@@ -50,9 +61,9 @@ module Stone
       # +klass_dir+:: directory in which object resides
       def delete(id, klass_dir)
         raise "Object could not be found" \
-          unless File.exists?(Stone.local_dir/klass_dir/"#{id}.yml")
+          unless File.exists?(self.local_dir/klass_dir/"#{id}.yml")
             
-        FileUtils.remove_file(Stone.local_dir/klass_dir/"#{id}.yml")
+        FileUtils.remove_file(self.local_dir/klass_dir/"#{id}.yml")
         true
       end
     end # self

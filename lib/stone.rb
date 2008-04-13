@@ -17,8 +17,6 @@ STONE_ROOT = Dir.pwd
 module Stone
   class << self
     
-    @@dir ||= ""
-    
     # See Stone::Utilities.backup
     def backup(from_path, to_path = nil)
       Stone::Utilities.backup(from_path, to_path)
@@ -39,15 +37,6 @@ module Stone
       Stone::Utilities.metrics_for(path)
     end
     
-    def local_dir=(value) #:nodoc:
-      @@dir = value
-    end
-    
-    # Provides the directory path to the local (app-specific) datastore
-    def local_dir
-      @@dir
-    end
-    
     # For spec stuff only
     def empty_datastore
       if File.exists? STONE_ROOT/"sandbox_for_specs/datastore"
@@ -60,14 +49,14 @@ module Stone
     # +path+<String>:: 
     #   Path to create or update datastore (usually an application's root)
     # +resources+<Array>:: A list of resources that exist for the application
-    def start(path, resources)
-      self.local_dir = path/"datastore#{}"
-      FileUtils.mkdir(self.local_dir) unless File.exists?(self.local_dir)
+    def start(path, resources, framework = nil)
+      DataStore.local_dir = path/"datastore"
+      FileUtils.mkdir(DataStore.local_dir) unless File.exists?(DataStore.local_dir)
       resources.each do |resource|
-        require resource
+        require resource unless framework == :merb || framework == :rails
         name = File.basename(resource).gsub(".rb", "").pluralize
-        unless File.exists? self.local_dir/name
-          FileUtils.mkdir(self.local_dir/name)
+        unless File.exists? DataStore.local_dir/name
+          FileUtils.mkdir(DataStore.local_dir/name)
         end
       end
     end

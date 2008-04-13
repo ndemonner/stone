@@ -39,7 +39,7 @@ describe Stone::Resource do
     @author.name = "Nick DeMonner"
     @author.email = "nick@cladby.com"
     @author.save
-    File.exists?(Stone.local_dir/"authors"/"1.yml").should be_true
+    File.exists?(Stone::DataStore.local_dir/"authors"/"1.yml").should be_true
   end
   
   it "should create an object whose id is last object.id + 1" do
@@ -65,6 +65,15 @@ describe Stone::Resource do
     @author.save
     person = Author[@author.id]
     person.name.should == "Mary Poppins"
+  end
+  
+  it "should accept Resource.find(hash) form" do
+    author = Author.first(:name => "Nick DeMonner")
+    author.should be_instance_of Author
+  end
+  
+  it "should raise an exception if more than one key, value pair are used in find" do
+    lambda {Author.first(:name => "Nick DeMonner", :email => "nick@cladby.com")}.should raise_error
   end
   
   it "should find and return all objects that match conditions provided" do
@@ -137,4 +146,28 @@ describe Stone::Resource do
     @post.save
     author.posts.size.should == 2
   end
+  
+  it "should accept Resource.new(hash) form" do
+    @author = Author.new(:name => "Ron DeMonner", :email => "ron@cladby.com")
+    @author.should be_valid
+  end
+  
+  it "should accept Resource.new(params[:resource]) form" do
+    params = {}
+    params[:author] = {:name => "Ron DeMonner", :email => "ron@cladby.com"}
+    @author = Author.new(params[:author])
+    @author.should be_valid
+  end
+  
+  it "should accept Resource.update_attributes(hash)" do
+    params = {}
+    params[:author] = {:name => "Ron DeMonner", :email => "ron@cladby.com"}
+    
+    plain_hash = {:name => "Nick DeMonner", :email => "nick@cladby.com"}
+    
+    author = Author.first(:name => "Nick DeMonner")
+    author.update_attributes(params[:author]).should be_true
+    author.update_attributes(plain_hash).should be_true
+  end
+
 end

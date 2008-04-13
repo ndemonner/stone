@@ -7,7 +7,7 @@ h2. What
 
 For small applications, a database can be overkill for storing your data in a consistent and
 organized manner. Therefore, Stone was built to provide plug-and-play data persistence for 
-any application or framework. It is fast, and it is easy... it is good.
+any application or framework. It is fast, and it is easy... therefore it is good.
 
 h2. Installing
 
@@ -23,7 +23,7 @@ h3. Rails
 <pre syntax="ruby">
   require 'stone'
   
-  Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,"app/models/*")))
+  Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,"app/models/*")), :rails)
 </pre>
 
 * Create some models! We'll use an Author as an example:
@@ -37,7 +37,7 @@ h3. Merb
 <pre syntax="ruby">
   require 'stone'
   
-  Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,"app/models/*")))
+  Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,"app/models/*")), :merb)
 </pre>
 
 * Create some models! We'll use an Author as an example:
@@ -81,6 +81,9 @@ h3. Get, Post, Put, and Delete
   Author.get(some_id)             # gets Author with some_id
   Author[some_id]                 # same as get()
   
+  # brings back first author whose name is "Nick DeMonner"
+  Author.first(:name => "Nick DeMonner")
+  
   # brings back first author whose name contains "Nick"
   Author.first("name.include?('Nick')")
   
@@ -99,10 +102,10 @@ h3. Get, Post, Put, and Delete
 * Putting
 <pre syntax="ruby">
   author = Author[some_id]        # gets Author with id of some_id
-  author.name                     # => "Nick DeMonner"
   
-  author.name = "Bob Bobberson"   # changes name
-  author.save                     # calls Author.put after validations
+  # updates name and calls Resource.save (which in turn calls Resource.put 
+  # because this resource is being updated, not created)
+  author.update_attributes(:name => "Bob Bobberson")
 </pre>
 
 * Deleting
@@ -133,7 +136,7 @@ This code is free to use under the terms of the MIT license.
 
 h2. Contributing
 
-PLEASE. Stone is extremely immature at this point, and so "stable" is
+PLEASE. Stone is extremely immature at this point -- "stable" is
 the watchword for the moment.
 
 * You can grab the source using Git:
