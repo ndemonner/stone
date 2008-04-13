@@ -166,9 +166,7 @@ module Stone
     # if no conditions are specified
     # === Parameters
     # +conditions+::
-    #   A string representing one or more Ruby expressions
-    # === Example
-    # <tt>Author.first("name ~= /Nick/i && email.include?('gmail.com')")</tt>
+    #   A hash representing one or more Ruby expressions
     def first(conditions = nil)
       unless conditions
         return @@store.resources[self.to_s.make_key].first[1]
@@ -181,9 +179,7 @@ module Stone
     # conditions are specified
     # === Parameters
     # +conditions+::
-    #   A string representing one or more Ruby expressions
-    # === Example
-    # <tt>Author.all("created_at < DateTime.now")</tt>
+    #   A hash representing one or more Ruby expressions
     def all(conditions = nil)
       objs = []
       unless conditions

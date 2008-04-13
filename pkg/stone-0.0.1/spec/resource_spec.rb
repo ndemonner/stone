@@ -72,6 +72,11 @@ describe Stone::Resource do
     author.should be_instance_of(Author)
   end
   
+  it "should accept be able to find an object using a regex" do
+    author = Author.first(:name.matches => /nick/i)
+    author.should be_instance_of(Author)
+  end
+  
   it "should raise an exception anything other than a Hash is provided for find" do
     lambda {Author.first("Nick")}.should raise_error
   end

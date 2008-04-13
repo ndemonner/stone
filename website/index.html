@@ -153,11 +153,11 @@ your data gets persisted to files within <code>myapp/datastore/</code>.</p>
   <span class="constant">Author</span><span class="punct">.</span><span class="ident">first</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Nick DeMonner</span><span class="punct">&quot;)</span>
   
   <span class="comment"># brings back first author whose name contains &quot;Nick&quot;</span>
-  <span class="constant">Author</span><span class="punct">.</span><span class="ident">first</span><span class="punct">(&quot;</span><span class="string">name.include?('Nick')</span><span class="punct">&quot;)</span>
+  <span class="constant">Author</span><span class="punct">.</span><span class="ident">first</span><span class="punct">(</span><span class="symbol">:name</span><span class="punct">.</span><span class="ident">includes</span> <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">Nick</span><span class="punct">')</span>
   
   <span class="comment"># brings back all authors whose email contains &quot;gmail.com&quot;, and who </span>
-  <span class="comment"># were created before some_date_time</span>
-  <span class="constant">Author</span><span class="punct">.</span><span class="ident">all</span><span class="punct">(&quot;</span><span class="string">email.include?('gmail.com') &amp;&amp; created_at &lt; some_date_time</span><span class="punct">&quot;)</span>
+  <span class="comment"># were created before today</span>
+  <span class="constant">Author</span><span class="punct">.</span><span class="ident">all</span><span class="punct">(</span><span class="symbol">:email</span><span class="punct">.</span><span class="ident">includes</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">gmail.com</span><span class="punct">&quot;,</span> <span class="symbol">:created_at</span><span class="punct">.</span><span class="ident">lt</span> <span class="punct">=&gt;</span> <span class="constant">DateTime</span><span class="punct">.</span><span class="ident">now</span><span class="punct">)</span>
 </pre></li>
 	</ul>
 
@@ -195,25 +195,59 @@ your data gets persisted to files within <code>myapp/datastore/</code>.</p>
 	<h3>A Word About Finding Stuff</h3>
 
 
-	<p>You&#8217;ll note that Stone uses a string containing ruby expressions to find
-your data. Any method works here, just be careful when inserting values.</p>
+	<p>Stone uses a series of unique methods (à la DataMapper) to finding objects. 
+You may use the following methods when searching:</p>
 
 
 	<ul>
-	<li>This&#8230;
-<pre class='syntax'>
-  <span class="constant">Author</span><span class="punct">.</span><span class="ident">first</span><span class="punct">(&quot;</span><span class="string">name == <span class="expr">#{name}</span></span><span class="punct">&quot;)</span>
-</pre>
-...won&#8217;t work.</li>
+	<li><pre class='syntax'>
+    <span class="comment"># matches all objects whose &lt;code&gt;field&lt;/code&gt; is greater </span>
+    <span class="comment"># than &lt;code&gt;thing&lt;/code&gt;</span>
+    <span class="symbol">:field</span><span class="punct">.</span><span class="ident">gt</span> <span class="punct">=&gt;</span> <span class="ident">thing</span>
+  </pre></li>
 	</ul>
 
 
 	<ul>
-	<li>Instead, use this&#8230;
-<pre class='syntax'>
-  <span class="constant">Author</span><span class="punct">.</span><span class="ident">first</span><span class="punct">(&quot;</span><span class="string">name == '<span class="expr">#{name}</span>'</span><span class="punct">&quot;)</span>
-</pre>
-... and your luck will change.</li>
+	<li><pre class='syntax'>
+    <span class="comment"># matches objects whose &lt;code&gt;field&lt;/code&gt; is greater than </span>
+    <span class="comment"># or equal to &lt;code&gt;thing&lt;/code&gt;</span>
+    <span class="symbol">:field</span><span class="punct">.</span><span class="ident">gte</span> <span class="punct">=&gt;</span> <span class="ident">thing</span>
+  </pre></li>
+	</ul>
+
+
+	<ul>
+	<li><pre class='syntax'>
+    <span class="comment"># matches all objects whose &lt;code&gt;field&lt;/code&gt; is less </span>
+    <span class="comment"># than &lt;code&gt;thing&lt;/code&gt;</span>
+    <span class="symbol">:field</span><span class="punct">.</span><span class="ident">lt</span> <span class="punct">=&gt;</span> <span class="ident">thing</span>
+  </pre></li>
+	</ul>
+
+
+	<ul>
+	<li><pre class='syntax'>
+    <span class="comment"># matches all objects whose &lt;code&gt;field&lt;/code&gt; is less than</span>
+    <span class="comment"># or equal to &lt;code&gt;thing&lt;/code&gt;</span>
+    <span class="symbol">:field</span><span class="punct">.</span><span class="ident">lte</span> <span class="punct">=&gt;</span> <span class="ident">thing</span>
+  </pre></li>
+	</ul>
+
+
+	<ul>
+	<li><pre class='syntax'>
+    <span class="comment"># matches all objects whose &lt;code&gt;field&lt;/code&gt; contains &lt;code&gt;thing&lt;/code&gt;</span>
+    <span class="symbol">:field</span><span class="punct">.</span><span class="ident">includes</span> <span class="punct">=&gt;</span> <span class="ident">thing</span>
+  </pre></li>
+	</ul>
+
+
+	<ul>
+	<li><pre class='syntax'>
+    <span class="comment"># matches objects whose &lt;code&gt;field&lt;/code&gt; matches &lt;code&gt;pattern&lt;/code&gt;</span>
+    <span class="symbol">:field</span><span class="punct">.</span><span class="ident">matches</span> <span class="punct">=&gt;</span> <span class="ident">pattern</span>   <span class="comment"># pattern is any RegEx</span>
+  </pre></li>
 	</ul>
 
 
