@@ -169,5 +169,10 @@ describe Stone::Resource do
     author.update_attributes(params[:author]).should be_true
     author.update_attributes(plain_hash).should be_true
   end
+  
+  it "should allow an attribute to accessed via obj[attribute]" do
+    author = Author.first(:name => "Nick DeMonner")
+    author[:id].should == 1
+  end
 
 end

@@ -20,6 +20,8 @@ module Stone
                     ".=~"
                   when :equals
                     ".=="
+                  when :not
+                    ".!="
                   end
     end
     

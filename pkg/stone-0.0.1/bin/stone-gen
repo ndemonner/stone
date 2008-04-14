@@ -30,6 +30,8 @@ def gen_model(args)
     model_str << "  field :#{field.first}, #{field.last.capitalize}\n"
   end
   model_str << "end"
+  FileUtils.mkdir(File.join(Dir.pwd, "app/models")) \
+    unless File.exists?(File.join(Dir.pwd, "app/models"))
   File.open(File.join(Dir.pwd, "app/models/#{file_name}.rb"), "w") do |file|
     file << model_str
   end

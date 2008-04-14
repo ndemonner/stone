@@ -20,4 +20,7 @@ class Symbol
   def equals
     Stone::Query.new(self.to_s, :equals)
   end
+  def not
+    Stone::Query.new(self.to_s, :not)
+  end
 end

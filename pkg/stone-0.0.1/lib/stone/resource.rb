@@ -24,6 +24,9 @@ module Stone
         base.send(:include, ::Validatable)
         
         unless base.to_s.downcase == "spec::example::examplegroup::subclass_1"
+          # allow object to be created with a hash of attributes...
+          # [] allows for obj[attribute] retrieval
+          # to_s allows for stupid Rails to work
           base.class_eval <<-EOS, __FILE__, __LINE__
             def initialize(hash = nil)
               self.id = self.next_id_for_klass(self.class)
@@ -38,6 +41,14 @@ module Stone
                   end
                 end
               end
+            end
+            
+            def to_s
+              id
+            end
+            
+            def [](sym)
+              self.send(sym)
             end
           EOS
         end
@@ -197,7 +208,7 @@ module Stone
     # +id+:: id of the object to retrieve
     def [](id)
       raise "Expected Fixnum, got #{id.class} for #{self.to_s}[]" \
-        unless id.class == Fixnum
+        unless id.class == Fixnum || id.to_i
       get(id)
     end
     
@@ -221,12 +232,13 @@ module Stone
     # === Parameters
     # +id+:: id of the object to retrieve 
     def get(id)
+      id = id.to_i
       raise "Expected Fixnum, got #{id.class} for #{self.to_s}.get" \
         unless id.class == Fixnum
       @@store.resources[self.to_s.make_key].each do |o|
         return o[1] if o[0] == id
       end
-      false
+      nil
     end
     
     # Puts the attribute changes in +hash+
@@ -281,6 +293,11 @@ module Stone
         end
       end
       true
+    end
+    
+    # Needed for Rails to work
+    def new_record?
+      !already_exists?
     end
     
     # Finds out if the object is already in the current DataStore instance

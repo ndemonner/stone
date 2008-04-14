@@ -1,21 +1,42 @@
-h1. Stone: Dead-Simple Persistence
+h1. Stone: Dead-Simple Data Persistence
 
 h1. &#x2192; 'stone'
 
+h2. Sections
 
-h2. What
+"What":#what
+
+"Installing":#installing
+
+"Getting Up and Running":#running
+* "Rails":#rails
+* "Merb":#merb
+* "Everywhere Else":#everywhere
+
+"Usage":#usage
+* "Get, Post, Put, and Delete":#gppd
+
+"A Word About Finding Stuff":#word
+
+"License":#license
+
+"Contributing":#contrib
+
+"Contact":#contact
+<br /><br />
+h2(#what). What
 
 For small applications, a database can be overkill for storing your data in a consistent and
 organized manner. Therefore, Stone was built to provide plug-and-play data persistence for 
 any application or framework. It is fast, and it is easy... therefore it is good.
 
-h2. Installing
+h2(#installing). Installing
 
 <pre>sudo gem install stone</pre>
 
-h2. Getting Up and Running
+h2(#running). Up and Running
 
-h3. Rails
+h3(#rails). Rails
 
 * Create a new file in <code>config/initializers</code> called <code>stone.rb</code>
 
@@ -26,26 +47,43 @@ h3. Rails
   Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,"app/models/*")), :rails)
 </pre>
 
-* Create some models! We'll use an Author as an example:
-<pre syntax="none">
-  stone-gen model:rails Author name:string
+* Open your <code>environment.rb</code> file and look for the following lines:
+<pre syntax="ruby">
+  # Skip frameworks you're not going to use (only works if using vendor/rails).
+  # To use Rails without a database, you must remove the Active Record framework
+  # config.frameworks -= [ :active_record, :active_resource, :action_mailer ]
 </pre>
 
-h3. Merb
+** Uncomment the last of those lines, and leave only active_record,
+so that it looks like this:
+<pre syntax="ruby">
+  # Skip frameworks you're not going to use (only works if using vendor/rails).
+  # To use Rails without a database, you must remove the Active Record framework
+  config.frameworks -= [ :active_record ]
+</pre>
+
+* Create some models! We'll use an Author as an example:
+<pre syntax="none">
+  stone-gen model Author name:string
+</pre>
+
+h3(#merb). Merb
 
 * Add the following code to your <code>init.rb</code> file:
 <pre syntax="ruby">
-  require 'stone'
+  dependency 'stone'
   
+  # add this in the Merb::BootLoader.after_app_loads block
+  # at the bottom of init.rb
   Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,"app/models/*")), :merb)
 </pre>
 
 * Create some models! We'll use an Author as an example:
 <pre syntax="none">
-  stone-gen model:merb Author name:string
+  stone-gen model Author name:string
 </pre>
 
-h3. Everywhere Else
+h3(#everywhere). Everywhere Else
 
 Stone was designed to provide easy data storage management for <strong>any</strong>
 app, not just web ones.
@@ -54,8 +92,8 @@ app, not just web ones.
 <pre syntax="ruby">
   require 'stone'
   
-  # replace my/path/to/models/ with wherever your models/resources may be
-  Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,"my/path/to/models/*")))
+  # replace path/to/models/ with wherever your models/resources may be
+  Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,"path/to/models/*")))
 </pre>
 
 * Create some models! We'll use an Author as an example:
@@ -72,9 +110,9 @@ app, not just web ones.
 That's it! Remember, there are no databases to install with Stone. Instead, 
 your data gets persisted to files within <code>myapp/datastore/</code>.
 
-h2. Usage
+h2(#usage). Usage
 
-h3. Get, Post, Put, and Delete
+h3(#gppd). Get, Post, Put, and Delete
 
 * Getting
 <pre syntax="ruby">
@@ -113,50 +151,60 @@ h3. Get, Post, Put, and Delete
   Author.delete(some_id)          # deletes Author at some_id
 </pre>
 
-h3. A Word About Finding Stuff
+h3(#word). A Word About Finding Stuff
 
 Stone uses a series of unique methods (à la DataMapper) to finding objects. 
 You may use the following methods when searching:
 
-* <pre syntax="ruby">
-    # matches all objects whose <code>field</code> is greater 
-    # than <code>thing</code>
-    :field.gt => thing
-  </pre>
 
-* <pre syntax="ruby">
-    # matches objects whose <code>field</code> is greater than 
-    # or equal to <code>thing</code>
-    :field.gte => thing
-  </pre>
+* Matches all objects whose <code>field</code> is greater 
+than <code>thing</code>
+<pre syntax="ruby">
+  :field.gt => thing
+</pre>
 
-* <pre syntax="ruby">
-    # matches all objects whose <code>field</code> is less 
-    # than <code>thing</code>
-    :field.lt => thing
-  </pre>
+* Matches all objects whose <code>field</code> is greater than
+or equal to <code>thing</code>
+<pre syntax="ruby">
+  :field.gte => thing
+</pre>
 
-* <pre syntax="ruby">
-    # matches all objects whose <code>field</code> is less than
-    # or equal to <code>thing</code>
-    :field.lte => thing
-  </pre>
+* Matches all objects whose <code>field</code> is less than <code>thing</code>
+<pre syntax="ruby">
+  :field.lt => thing
+</pre>
 
-* <pre syntax="ruby">
-    # matches all objects whose <code>field</code> contains <code>thing</code>
-    :field.includes => thing
-  </pre>
+* Matches all objects whose <code>field</code> is less than or 
+equal to <code>thing</code>
+<pre syntax="ruby">
+  :field.lte => thing
+</pre>
 
-* <pre syntax="ruby">
-    # matches objects whose <code>field</code> matches <code>pattern</code>
-    :field.matches => pattern   # pattern is any RegEx
-  </pre>
-  
-h2. License
+* Matches all objects whose <code>field</code> includes <code>thing</code>
+<pre syntax="ruby">
+  :field.includes => thing
+</pre>
+
+* Matches all objects whose <code>field</code> is equal to <code>thing</code>
+<pre syntax="ruby">
+  :field.equals => thing
+</pre>
+
+* Matches all objects whose <code>field</code> Regexp matches <code>thing</code>
+<pre syntax="ruby">
+  :field.matches => regexp
+</pre>
+
+* Matches all objects whose <code>field</code> does not equal <code>thing</code>
+<pre syntax="ruby">
+  :field.not => thing
+</pre>
+
+h2(#license). License
 
 This code is free to use under the terms of the MIT license. 
 
-h2. Contributing
+h2(#contrib). Contributing
 
 PLEASE. Stone is extremely immature at this point -- "stable" is
 the watchword for the moment.
@@ -172,6 +220,6 @@ by running <code>rake ok</code> every once in a while.
 Please add specs for any new functionality you might add, and hit me up to
 commit. =D
 
-h2. Contact
+h2(#contact). Contact
 
 Comments are welcome. Join me in the IRC channel #stone on freenode.
