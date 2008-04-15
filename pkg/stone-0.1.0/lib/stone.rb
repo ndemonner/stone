@@ -4,7 +4,6 @@ require 'validatable'
 require 'english/inflect'
 require 'facets'
 require 'yaml'
-require 'fastercsv'
 
 require File.expand_path(File.dirname(__FILE__) + '/stone/core_ext/string')
 require File.expand_path(File.dirname(__FILE__) + '/stone/core_ext/symbol')

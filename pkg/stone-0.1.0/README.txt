@@ -21,7 +21,6 @@ any application or framework. It is fast, and it is easy... it is good.
 * English
 * Facets
 * Validatable
-* Fastercsv (for csv exporting/importing)
 
 == INSTALL:
 
