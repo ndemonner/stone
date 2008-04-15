@@ -37,7 +37,11 @@ def gen_model(args)
   fields = Hash[*(args.map{|a| a.split(":") }.flatten)]
   model_str = "class #{model_name}\n  include Stone::Resource\n\n"
   for field in fields
-    model_str << "  field :#{field.first}, #{field.last.capitalize}\n"
+    unless field.last == "datetime"
+      model_str << "  field :#{field.first}, #{field.last.capitalize}\n"
+    else
+      model_str << "  field :#{field.first}, DateTime\n"
+    end
   end
   model_str << "end"
   FileUtils.mkdir(File.join(Dir.pwd, "app/models")) \
