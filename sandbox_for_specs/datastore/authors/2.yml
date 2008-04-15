@@ -1,10 +1,10 @@
 --- !ruby/object:Author 
-created_at: 2008-04-14T19:32:21-07:00
+created_at: 2008-04-14T22:09:02-07:00
 email: heyo@something.com
 errors: !ruby/object:Validatable::Errors 
   errors: {}
 
-favorite_number: 35
+favorite_number: 47
 id: 2
 name: Mike McMichaels
 times_validated_hash: 

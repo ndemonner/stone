@@ -8,7 +8,7 @@ def usage
   puts <<-EOS
   
   
-    stone-gen [model | export | metrics]
+    stone-gen model
 
 
   EOS
