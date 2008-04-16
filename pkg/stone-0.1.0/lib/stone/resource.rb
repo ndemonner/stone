@@ -198,7 +198,17 @@ module Stone
           objs << o[1]
         end
       else
+        if conditions[:order]
+          order = conditions[:order].to_a.flatten
+          conditions.delete(:order)
+        end
         objs = find(conditions, self.to_s.make_key)
+      end
+      if order
+        raise "Order should be passed with :asc or :desc, got #{order[1].inspect}" \
+          unless [:asc,:desc].include? order[1]
+        objs.sort! {|x,y| x.send(order[0]) <=> y.send(order[0])}
+        objs.reverse! if order[1] == :desc
       end
       objs
     end

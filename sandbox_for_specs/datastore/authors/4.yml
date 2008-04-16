@@ -1,10 +1,10 @@
 --- !ruby/object:Author 
-created_at: 2008-04-15T16:30:05-07:00
+created_at: 2008-04-16T10:16:10-07:00
 email: nick@gmail.com
 errors: !ruby/object:Validatable::Errors 
   errors: {}
 
-favorite_number: 24
+favorite_number: 15
 id: 4
 name: Nick Hicklesby
 times_validated_hash: 

@@ -102,8 +102,9 @@ pre, code {
 .expr { color: #daefa3; }
 
 #version {
+  width:250px;
   float: right;
-  text-align: right;
+  text-align: center;
   font-family: sans-serif;
   font-weight: normal;
   background-color: #cb6b4e;
@@ -114,6 +115,7 @@ pre, code {
 }
 
 #version .numbers {
+  text-align:center;
   display: block;
   font-size: 4em;
   line-height: 0.8em;

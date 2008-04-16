@@ -186,5 +186,14 @@ describe Stone::Resource do
     authors = Author.all(:name.matches => /o/, :created_at.lt => DateTime.now>>1)
     authors.size.should == 2
   end
+  
+  it "should allow for ordering of query results" do
+    authors = Author.all(:created_at.lt => DateTime.now>>1, :order => {:created_at => :desc})
+    authors.last.name.should == "Nick DeMonner"
+  end
+  
+  it "should only accept :asc or :desc for ordering" do
+    lambda {Author.all(:created_at.lt => DateTime.now>>1, :order => {:created_at => :cool})}.should raise_error
+  end
 
 end

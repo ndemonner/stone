@@ -148,6 +148,10 @@ h3(#gppd). Get, Post, Put, and Delete
   # brings back all authors whose email contains "gmail.com", and who 
   # were created before today
   Author.all(:email.includes => "gmail.com", :created_at.lt => DateTime.now)
+  
+  # brings back all Authors created before today, and orders them descending
+  # from most recent to least
+  Author.all(:created_at.lt => DateTime.now, :order => {:created_at => :desc})
 </pre>
 
 * Posting
