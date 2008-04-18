@@ -33,6 +33,10 @@ For small applications, a database can be overkill for storing your data in a co
 organized manner. Therefore, Stone was built to provide plug-and-play data persistence for 
 any application or framework. It is fast, and it is easy... therefore it is good.
 
+You can check out an application that uses Merb+Stone "here.":http://theprestigio.us
+
+The source for that blog is "here.":http://github.com/ndemonner/written_in_stone/tree/master
+
 h2(#installing). Installing
 
 <pre>sudo gem install stone</pre>

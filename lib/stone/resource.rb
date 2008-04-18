@@ -193,15 +193,16 @@ module Stone
     #   A hash representing one or more Ruby expressions
     def all(conditions = nil)
       objs = []
+      if conditions[:order]
+        order = conditions[:order].to_a.flatten
+        conditions.delete(:order)
+        conditions = nil if conditions.empty?
+      end
       unless conditions
         @@store.resources[self.to_s.make_key].each do |o|
           objs << o[1]
         end
       else
-        if conditions[:order]
-          order = conditions[:order].to_a.flatten
-          conditions.delete(:order)
-        end
         objs = find(conditions, self.to_s.make_key)
       end
       if order

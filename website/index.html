@@ -33,7 +33,7 @@
     <h1>Stone: Dead-Simple Data Persistence</h1>
     <div id="version" class="clickable" onclick='document.location = "http://rubyforge.org/projects/stone"; return false'>
       <p>Get Version</p>
-      <a href="http://rubyforge.org/projects/stone" class="numbers">0.1.0</a>
+      <a href="http://rubyforge.org/projects/stone" class="numbers">0.1.1</a>
     </div>
     <h1>&#x2192; &#8216;stone&#8217;</h1>
 
@@ -82,6 +82,12 @@
 	<p>For small applications, a database can be overkill for storing your data in a consistent and
 organized manner. Therefore, Stone was built to provide plug-and-play data persistence for 
 any application or framework. It is fast, and it is easy&#8230; therefore it is good.</p>
+
+
+	<p>You can check out an application that uses Merb+Stone <a href="http://theprestigio.us">here.</a></p>
+
+
+	<p>The source for that blog is <a href="http://github.com/ndemonner/written_in_stone/tree/master">here.</a></p>
 
 
 	<h2 id="installing">Installing</h2>
@@ -239,6 +245,10 @@ your data gets persisted to files within <code>myapp/datastore/</code>.</p>
   <span class="comment"># brings back all authors whose email contains &quot;gmail.com&quot;, and who </span>
   <span class="comment"># were created before today</span>
   <span class="constant">Author</span><span class="punct">.</span><span class="ident">all</span><span class="punct">(</span><span class="symbol">:email</span><span class="punct">.</span><span class="ident">includes</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">gmail.com</span><span class="punct">&quot;,</span> <span class="symbol">:created_at</span><span class="punct">.</span><span class="ident">lt</span> <span class="punct">=&gt;</span> <span class="constant">DateTime</span><span class="punct">.</span><span class="ident">now</span><span class="punct">)</span>
+  
+  <span class="comment"># brings back all Authors created before today, and orders them descending</span>
+  <span class="comment"># from most recent to least</span>
+  <span class="constant">Author</span><span class="punct">.</span><span class="ident">all</span><span class="punct">(</span><span class="symbol">:created_at</span><span class="punct">.</span><span class="ident">lt</span> <span class="punct">=&gt;</span> <span class="constant">DateTime</span><span class="punct">.</span><span class="ident">now</span><span class="punct">,</span> <span class="symbol">:order</span> <span class="punct">=&gt;</span> <span class="punct">{</span><span class="symbol">:created_at</span> <span class="punct">=&gt;</span> <span class="symbol">:desc</span><span class="punct">})</span>
 </pre></li>
 	</ul>
 
@@ -381,12 +391,20 @@ commit. =D</p>
 
 	<p>Comments are welcome. Join me in the <span class="caps">IRC</span> channel #stone on freenode.</p>
     <p class="coda">
-      Nick DeMonner, 14th April 2008<br>
+      <a href="http://theprestigio.us">Nick DeMonner</a>, 17th April 2008<br>
       Theme extended from <a href="http://rb2js.rubyforge.org/">Paul Battley</a>
     </p>
 </div>
 
 <!-- insert site tracking codes here, like Google Urchin -->
-
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-2831521-3");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
 </body>
 </html>

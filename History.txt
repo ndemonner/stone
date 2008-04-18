@@ -1,3 +1,7 @@
+== 0.1.1 2008-04-16
+
+* Added result ordering to Resource.all
+
 == 0.1.0 2008-04-15
 
 * Initial release
