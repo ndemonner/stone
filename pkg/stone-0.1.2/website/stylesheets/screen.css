@@ -1,0 +1,152 @@
+body {
+  background-color: #141414;
+  font-family: sans-serif;
+  font-size: 16px;
+  line-height: 1.6em;
+  padding: 1.6em 0 0 0;
+  color: #f8f8f8;
+}
+h1, h2, h3, h4, h5, h6 {
+  color: #f8f8f8;
+}
+h1 { 
+  font-family: sans-serif;
+  font-weight: normal;
+  font-size: 4em;
+  line-height: 0.8em;
+  letter-spacing: -0.1ex;
+	margin: 5px;
+}
+li {
+  padding: 0;
+  margin: 0;
+  list-style-type: square;
+}
+a {
+  color: #141414;
+  padding:2px;
+	background-color: #cb6b4e;
+  font-weight: normal;
+  text-decoration:none;
+}
+
+a:hover {
+  text-decoration:underline;
+}
+blockquote {
+  font-size: 90%;
+  font-style: italic;
+  border-left: 1px solid #111;
+  padding-left: 1em;
+}
+.caps {
+  font-size: 80%;
+}
+
+#main {
+  width: 45em;
+  padding: 0;
+  margin: 0 auto;
+}
+.coda {
+  text-align: right;
+  color: #f8f8f8;
+  font-size: smaller;
+}
+
+table {
+  font-size: 90%;
+  line-height: 1.4em;
+  color: #ff8;
+  background-color: #111;
+  padding: 2px 10px 2px 10px;
+	border-style: dashed;
+}
+
+th {
+	color: #fff;
+}
+
+td {
+  padding: 2px 10px 2px 10px;
+}
+
+.success {
+	color: #0CC52B;
+}
+
+.failed {
+	color: #E90A1B;
+}
+
+.unknown {
+	color: #995000;
+}
+pre, code {
+  font-family: Monaco, monospace;
+  font-size: 90%;
+  line-height: 1.4em;
+  color: #f8f8f8;
+  background-color: #282828;
+  padding: 2px 10px 2px 10px;
+}
+.comment { color: #5f5a60; font-style: italic; }
+.keyword { color: #caa86b; }
+.punct { color: #eee; }
+.symbol { color: #cb6b4e; }
+.string { color: #8f9d6b; }
+.ident { color: #f8f8f8; }
+.constant { color: #9a859d; }
+.regex { color: #ec6; }
+.number { color: #F99; }
+.expr { color: #daefa3; }
+
+#version {
+  width:250px;
+  float: right;
+  text-align: center;
+  font-family: sans-serif;
+  font-weight: normal;
+  background-color: #cb6b4e;
+  color: #141414;
+  padding: 15px 20px 10px 20px;
+  margin: 0 auto;
+	margin-top: 15px;
+}
+
+#version .numbers {
+  text-align:center;
+  display: block;
+  font-size: 4em;
+  line-height: 0.8em;
+  letter-spacing: -0.1ex;
+	margin-bottom: 15px;
+}
+
+#version p {
+  text-decoration: none;
+	color: #141414;
+	background-color: #cb6b4e;
+	margin: 0;
+	padding: 0;
+}
+
+#version a {
+  text-decoration: none;
+	color: #141414;
+	background-color: #cb6b4e;
+}
+
+strong {
+  font-weight:normal;
+  font-style:italic;
+}
+
+#version a:hover {
+  text-decoration:underline;
+}
+.clickable {
+	cursor:	pointer; 
+	cursor:	hand;
+}
+
