@@ -22,7 +22,8 @@ module Stone
         
         base.send(:extend, self)
         base.send(:include, ::Validatable)
-      
+        
+        # rspec breaks if its classes have their contructor overwritten
         unless base.to_s.downcase =~ /spec::example::examplegroup::subclass_\d/
           # allow object to be created with a hash of attributes...
           # [] allows for obj[attribute] retrieval
@@ -87,6 +88,7 @@ module Stone
       
       name = name.to_s
       
+      # add accessor for given field
       self.class_eval <<-EOS, __FILE__, __LINE__
         def #{name}
           @#{name}
@@ -109,6 +111,9 @@ module Stone
     # Registers the given method with the current instance of Callbacks. Upon
     # activation (in this case, right before Resource.save is executed), the
     # +meth+ given is called against the object being, in this case, saved.
+    #
+    # Note that there is no before_validation callback, because Stone
+    # before_save triggers before validations occur anyway
     # === Parameters
     # +meth+:: The method to be registered
     def before_save(meth)
@@ -141,7 +146,7 @@ module Stone
       @@callbacks.register(:after_delete, meth, self)
     end
     
-    # Registers a has_many relationship for +resource+
+    # Registers a one-to-many relationship for +resource+
     # === Parameters
     # +resource+::
     #   the resource of which this class has many
@@ -153,11 +158,15 @@ module Stone
       EOS
     end
     
+    # Registers a one-to-one relationship for +resource+
+    # === Parameters
+    # +resource+::
+    #   the resource of which this class has one
     def has_one(resource, *args)
       field "#{resource.to_s}_id".to_sym, Fixnum
     end
     
-    # Registers a belongs_to relationship for resource
+    # Registers a belongs_to association for +resource+
     # === Parameters
     # +resource+ :: The resource to which this class belongs
     def belongs_to(resource, *args)
@@ -193,11 +202,16 @@ module Stone
     #   A hash representing one or more Ruby expressions
     def all(conditions = nil)
       objs = []
+      # check for order conditions, make conditions nil if an order condition
+      # is the only one passed to Resource.all
       if conditions && conditions[:order]
         order = conditions[:order].to_a.flatten
         conditions.delete(:order)
         conditions = nil if conditions.empty?
       end
+      # Don't bother getting into crazy object searches if there are no
+      # conditions -- just grab the objects directly out of the current 
+      # store
       unless conditions
         @@store.resources[self.to_s.make_key].each do |o|
           objs << o[1]
@@ -208,6 +222,8 @@ module Stone
       if order
         raise "Order should be passed with :asc or :desc, got #{order[1].inspect}" \
           unless [:asc,:desc].include? order[1]
+        # FIXME: something about this breaks under certain conditions 
+        # that I can't find yet
         begin
           objs.sort! {|x,y| x.send(order[0]) <=> y.send(order[0])}
         rescue

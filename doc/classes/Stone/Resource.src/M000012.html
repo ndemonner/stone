@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>included (Stone::Resource)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/stone/resource.rb, line 15</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">included</span>(<span class="ruby-identifier">base</span>)
+        <span class="ruby-identifier">rsrc_sym</span> = <span class="ruby-identifier">base</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">make_key</span>
+        
+        <span class="ruby-ivar">@@callbacks</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Callbacks</span>.<span class="ruby-identifier">new</span>
+        <span class="ruby-ivar">@@callbacks</span>.<span class="ruby-identifier">register_klass</span>(<span class="ruby-identifier">base</span>)
+        
+        <span class="ruby-ivar">@@store</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">DataStore</span>.<span class="ruby-identifier">new</span>
+        
+        <span class="ruby-identifier">base</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">:extend</span>, <span class="ruby-keyword kw">self</span>)
+        <span class="ruby-identifier">base</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">:include</span>, <span class="ruby-operator">::</span><span class="ruby-constant">Validatable</span>)
+      
+        <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">base</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">downcase</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/spec::example::examplegroup::subclass_\d/</span>
+          <span class="ruby-comment cmt"># allow object to be created with a hash of attributes...</span>
+          <span class="ruby-comment cmt"># [] allows for obj[attribute] retrieval</span>
+          <span class="ruby-comment cmt"># to_s allows for stupid Rails to work</span>
+          <span class="ruby-identifier">base</span>.<span class="ruby-identifier">class_eval</span> <span class="ruby-value str">&quot;def initialize(hash = nil)\nself.id = self.next_id_for_klass(self.class)\nunless hash.blank?\nhash.each_key do |k|\nif hash[k].is_a? Hash\nhash[k].each do |k,v|\nself.send(k.to_s+\&quot;=\&quot;,v)\nend\nelse\nself.send(k.to_s+\&quot;=\&quot;, hash[k])\nend\nend\nend\nend\n\ndef to_s\nid\nend\n\ndef [](sym)\nself.send(sym)\nend\n&quot;</span>, <span class="ruby-keyword kw">__FILE__</span>, <span class="ruby-keyword kw">__LINE__</span>
+        <span class="ruby-keyword kw">end</span>
+        
+        <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@@store</span>.<span class="ruby-identifier">resources</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">rsrc_sym</span>)
+          <span class="ruby-ivar">@@store</span>.<span class="ruby-identifier">resources</span>[<span class="ruby-identifier">rsrc_sym</span>] = <span class="ruby-constant">DataStore</span>.<span class="ruby-identifier">load_data</span>(<span class="ruby-identifier">rsrc_sym</span>)
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

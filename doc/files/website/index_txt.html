@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>File: index.txt</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+  <div id="fileHeader">
+    <h1>index.txt</h1>
+    <table class="header-table">
+    <tr class="top-aligned-row">
+      <td><strong>Path:</strong></td>
+      <td>website/index.txt
+      </td>
+    </tr>
+    <tr class="top-aligned-row">
+      <td><strong>Last Update:</strong></td>
+      <td>Thu Apr 17 14:06:40 -0700 2008</td>
+    </tr>
+    </table>
+  </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+h1. Stone: Dead-Simple Data Persistence
+</p>
+<p>
+h1. &amp;x2192; &#8216;stone&#8216;
+</p>
+<p>
+!images/stone.png!
+</p>
+<p>
+h2. Sections
+</p>
+<p>
+&quot;What&quot;:what
+</p>
+<p>
+&quot;Installing&quot;:installing
+</p>
+<p>
+&quot;Getting Up and Running&quot;:running
+</p>
+<ul>
+<li>&quot;Rails&quot;:rails
+
+</li>
+<li>&quot;Merb&quot;:merb
+
+</li>
+<li>&quot;Everywhere Else&quot;:everywhere
+
+</li>
+</ul>
+<p>
+&quot;Usage&quot;:usage
+</p>
+<ul>
+<li>&quot;Models&quot;:models
+
+</li>
+<li>&quot;Get, Post, Put, and Delete&quot;:gppd
+
+</li>
+</ul>
+<p>
+&quot;A Word About Finding Stuff&quot;:word
+</p>
+<p>
+&quot;License&quot;:license
+</p>
+<p>
+&quot;Contributing&quot;:contrib
+</p>
+<p>
+&quot;Contact&quot;:contact &lt;br /&gt;&lt;br /&gt; h2(what). What
+</p>
+<p>
+For small applications, a database can be overkill for storing your data in
+a consistent and organized manner. Therefore, Stone was built to provide
+plug-and-play data persistence for any application or framework. It is
+fast, and it is easy&#8230; therefore it is good.
+</p>
+<p>
+You can check out an application that uses Merb+Stone &quot;here.&quot;:<a
+href="http://theprestigio.us">theprestigio.us</a>
+</p>
+<p>
+The source for that blog is &quot;here.&quot;:<a
+href="http://github.com/ndemonner/written_in_stone/tree/master">github.com/ndemonner/written_in_stone/tree/master</a>
+</p>
+<p>
+h2(installing). Installing
+</p>
+<p>
+&lt;pre&gt;sudo gem install stone&lt;/pre&gt;
+</p>
+<p>
+h2(running). Up and Running
+</p>
+<p>
+h3(rails). Rails
+</p>
+<ul>
+<li>Create a new file in <tt>config/initializers</tt> called <tt>stone.rb</tt>
+
+</li>
+<li>Add the following code to your new file:
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  require 'stone'
+
+  Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,&quot;app/models/*&quot;)), :rails)
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Open your <tt>environment.rb</tt> file and look for the following lines:
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  # Skip frameworks you're not going to use (only works if using vendor/rails).
+  # To use Rails without a database, you must remove the Active Record framework
+  # config.frameworks -= [ :active_record, :active_resource, :action_mailer ]
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<p>
+** Uncomment the last of those lines, and leave only active_record, so that
+it looks like this: &lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  # Skip frameworks you're not going to use (only works if using vendor/rails).
+  # To use Rails without a database, you must remove the Active Record framework
+  config.frameworks -= [ :active_record ]
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Create some models! We&#8216;ll use an Author as an example:
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;none&quot;&gt;
+</p>
+<pre>
+  stone-gen model Author name:string
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<p>
+h3(merb). Merb
+</p>
+<ul>
+<li>Add the following code to your <tt>init.rb</tt> file:
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  dependency 'stone'
+
+  # add this in the Merb::BootLoader.after_app_loads block
+  # at the bottom of init.rb
+  Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,&quot;app/models/*&quot;)), :merb)
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Create some models! We&#8216;ll use an Author as an example:
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;none&quot;&gt;
+</p>
+<pre>
+  stone-gen model Author name:string
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<p>
+h3(everywhere). Everywhere Else
+</p>
+<p>
+Stone was designed to provide easy data storage management for
+&lt;strong&gt;any&lt;/strong&gt; app, not just web ones.
+</p>
+<ul>
+<li>Wherever you load your app, add the following:
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  require 'stone'
+
+  # replace path/to/models/ with wherever your models/resources may be
+  Stone.start(Dir.pwd, Dir.glob(File.join(Dir.pwd,&quot;path/to/models/*&quot;)))
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Create some models! See &quot;Models&quot;:models.
+
+</li>
+</ul>
+<p>
+That&#8216;s it! Remember, there are no databases to install with Stone.
+Instead, your data gets persisted to files within
+<tt>myapp/datastore/</tt>.
+</p>
+<p>
+h2(usage). Usage
+</p>
+<p>
+h3(models). Model Files
+</p>
+<p>
+Models are really easy to create. Here is an example: &lt;pre
+syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  class Person
+    include Stone::Resource   # gives you access to persistence methods
+
+    # defines an attribute called &quot;name&quot; of type String
+    field :name, String
+
+    # defines an attribute called &quot;email&quot; of type String.
+    # Since :unique =&gt; true is set, &quot;email&quot; must be unique.
+    field :email, String, :unique =&gt; true
+
+    # Notifies Stone of a relationship between People and Jewels.
+    # This allows for @person.jewels retrieval.
+    has_many :jewels
+
+    # both name and email must be present or errors will be added
+    validates_presence_of :name, :email
+  end
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<p>
+For more validation methods, see &quot;here&quot;:<a
+href="http://validatable.rubyforge.org/classes/Validatable/Macros.html">validatable.rubyforge.org/classes/Validatable/Macros.html</a>.
+</p>
+<p>
+h3(gppd). Get, Post, Put, and Delete
+</p>
+<ul>
+<li>Getting
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  Author.get(some_id)             # gets Author with some_id
+  Author[some_id]                 # same as get()
+
+  # brings back first author whose name is &quot;Nick DeMonner&quot;
+  Author.first(:name =&gt; &quot;Nick DeMonner&quot;)
+
+  # brings back first author whose name contains &quot;Nick&quot;
+  Author.first(:name.includes =&gt; 'Nick')
+
+  # brings back all authors whose email contains &quot;gmail.com&quot;, and who
+  # were created before today
+  Author.all(:email.includes =&gt; &quot;gmail.com&quot;, :created_at.lt =&gt; DateTime.now)
+
+  # brings back all Authors created before today, and orders them descending
+  # from most recent to least
+  Author.all(:created_at.lt =&gt; DateTime.now, :order =&gt; {:created_at =&gt; :desc})
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Posting
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  author = Author.new
+  author.name = &quot;Nick DeMonner&quot;
+  author.save                     # calls Author.post after validations
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Putting
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  author = Author[some_id]        # gets Author with id of some_id
+
+  # updates name and calls Resource.save (which in turn calls Resource.put
+  # because this resource is being updated, not created)
+  author.update_attributes(:name =&gt; &quot;Bob Bobberson&quot;)
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Deleting
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  Author.delete(some_id)          # deletes Author at some_id
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<p>
+h3(word). A Word About Finding Stuff
+</p>
+<p>
+Stone uses a series of unique methods (à la DataMapper) to finding
+objects. You may use the following methods when searching:
+</p>
+<ul>
+<li>Matches all objects whose <tt>field</tt> is greater
+
+</li>
+</ul>
+<p>
+than <tt>thing</tt> &lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  :field.gt =&gt; thing
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Matches all objects whose <tt>field</tt> is greater than
+
+</li>
+</ul>
+<p>
+or equal to <tt>thing</tt> &lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  :field.gte =&gt; thing
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Matches all objects whose <tt>field</tt> is less than <tt>thing</tt>
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  :field.lt =&gt; thing
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Matches all objects whose <tt>field</tt> is less than or
+
+</li>
+</ul>
+<p>
+equal to <tt>thing</tt> &lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  :field.lte =&gt; thing
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Matches all objects whose <tt>field</tt> includes <tt>thing</tt>
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  :field.includes =&gt; thing
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Matches all objects whose <tt>field</tt> is equal to <tt>thing</tt>
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  :field.equals =&gt; thing
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Matches all objects whose <tt>field</tt> Regexp matches <tt>thing</tt>
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  :field.matches =&gt; regexp
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<ul>
+<li>Matches all objects whose <tt>field</tt> does not equal <tt>thing</tt>
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;ruby&quot;&gt;
+</p>
+<pre>
+  :field.not =&gt; thing
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<p>
+h2(license). License
+</p>
+<p>
+This code is free to use under the terms of the MIT license.
+</p>
+<p>
+h2(contrib). Contributing
+</p>
+<p>
+PLEASE. Stone is extremely immature at this point &#8212;
+&quot;stable&quot; is the watchword for the moment.
+</p>
+<ul>
+<li>You can grab the source using Git:
+
+</li>
+</ul>
+<p>
+&lt;pre syntax=&quot;none&quot;&gt;
+</p>
+<pre>
+  git clone git://github.com/ndemonner/stone.git
+</pre>
+<p>
+&lt;/pre&gt;
+</p>
+<p>
+The code is pretty well specced out, so make sure you don&#8216;t break
+anything by running <tt>rake ok</tt> every once in a while.
+</p>
+<p>
+Please add specs for any new functionality you might add, and hit me up to
+commit. =D
+</p>
+<p>
+h2(contact). Contact
+</p>
+<p>
+Comments are welcome. Join me in the IRC channel stone on freenode.
+</p>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Stone::Query)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/stone/query.rb, line 7</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">field</span>,<span class="ruby-identifier">op</span>)
+      <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">field</span> = <span class="ruby-identifier">field</span>
+      <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">op</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">op</span>
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:gt</span>
+                    <span class="ruby-value str">&quot;.&gt;&quot;</span>
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:lt</span>
+                    <span class="ruby-value str">&quot;.&lt;&quot;</span>
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:gte</span>
+                    <span class="ruby-value str">&quot;.&gt;=&quot;</span>
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:lte</span>
+                    <span class="ruby-value str">&quot;.&lt;=&quot;</span>
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:includes</span>
+                    <span class="ruby-value str">&quot;.include?&quot;</span>
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:matches</span>
+                    <span class="ruby-value str">&quot;.=~&quot;</span>
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:equals</span>
+                    <span class="ruby-value str">&quot;.==&quot;</span>
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:not</span>
+                    <span class="ruby-value str">&quot;.!=&quot;</span>
+                  <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

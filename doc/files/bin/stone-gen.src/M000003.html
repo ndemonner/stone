@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>gen_model (bin/stone-gen)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File bin/stone-gen, line 35</span>
+<span class="ruby-keyword kw">def</span> <span class="ruby-identifier">gen_model</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">model_name</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">camelcase</span>
+  <span class="ruby-identifier">file_name</span> = <span class="ruby-identifier">model_name</span>.<span class="ruby-identifier">snakecase</span>
+  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>
+  <span class="ruby-identifier">fields</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-operator">*</span>(<span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;:&quot;</span>) }.<span class="ruby-identifier">flatten</span>)]
+  <span class="ruby-identifier">model_str</span> = <span class="ruby-node">&quot;class #{model_name}\n  include Stone::Resource\n\n&quot;</span>
+  <span class="ruby-keyword kw">for</span> <span class="ruby-identifier">field</span> <span class="ruby-keyword kw">in</span> <span class="ruby-identifier">fields</span>
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">field</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;datetime&quot;</span>
+      <span class="ruby-identifier">model_str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  field :#{field.first}, #{field.last.capitalize}\n&quot;</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">model_str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  field :#{field.first}, DateTime\n&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span>
+  <span class="ruby-identifier">model_str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;end&quot;</span>
+  <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-value str">&quot;app/models&quot;</span>)) \
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-value str">&quot;app/models&quot;</span>))
+  <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-node">&quot;app/models/#{file_name}.rb&quot;</span>), <span class="ruby-value str">&quot;w&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">file</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">model_str</span>
+  <span class="ruby-keyword kw">end</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Model: #{model_name} created.&quot;</span>
+<span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
