@@ -24,7 +24,7 @@ module Stone
         base.send(:include, ::Validatable)
         
         # rspec breaks if its classes have their contructor overwritten
-        unless base.to_s.downcase =~ /spec::example::examplegroup::subclass_\d/
+        unless base.to_s.downcase =~ /(spec::example::examplegroup::subclass_\d|blah)/
           # allow object to be created with a hash of attributes...
           # [] allows for obj[attribute] retrieval
           # to_s allows for stupid Rails to work
@@ -41,6 +41,9 @@ module Stone
                     self.send(k.to_s+"=", hash[k])
                   end
                 end
+              end
+              @@fields[self.class.to_s.make_key].each do |f|
+                instance_variable_set("@"+f[:name].to_s,[]) if f[:klass] == Array
               end
             end
             
@@ -68,13 +71,11 @@ module Stone
     # +name+<String>::
     #    
     def field(name, klass, arg = nil)
-      
       if arg && arg[:unique] == true
         unique = true
       else
         unique = false
       end
-      
       klass_sym = self.to_s.make_key
       unless @@fields[klass_sym]
         @@fields[klass_sym] = [{:name => name, 
@@ -85,20 +86,26 @@ module Stone
                                 :klass => klass, 
                                 :unique => unique}
       end
-      
       name = name.to_s
-      
       # add accessor for given field
-      self.class_eval <<-EOS, __FILE__, __LINE__
-        def #{name}
-          @#{name}
-        end
+      unless klass == Array
+        self.class_eval <<-EOS, __FILE__, __LINE__
+          def #{name}
+            @#{name}
+          end
         
-        def #{name}=(value)
-          @#{name} = value
-        end
-      EOS
-    end
+          def #{name}=(value)
+            @#{name} = value
+          end
+        EOS
+      else
+        self.class_eval <<-EOS, __FILE__, __LINE__          
+          def #{name}
+            @#{name}
+          end
+        EOS
+      end
+    end # field
     
     def id=(value)
       @id = value
@@ -152,7 +159,7 @@ module Stone
     #   the resource of which this class has many
     def has_many(resource, *args)
       self.class_eval <<-EOS, __FILE__, __LINE__
-        def #{resource.to_s} 
+        def #{resource.to_s}
           #{resource.to_s.singularize.titlecase}.all("#{self.to_s.downcase}_id".to_sym.equals => self.id)
         end
       EOS
@@ -178,9 +185,16 @@ module Stone
       EOS
     end
     
-    # TODO: implement this
+    # Registers a many-to-many association using an array of +resource+
+    # ids.
+    # === Parameters
+    # +resource+::
+    #   The resource of which this class belongs to and has many
     def has_and_belongs_to_many(resource, *args)
+      field resource, Array
     end
+    
+    alias_method :habtm, :has_and_belongs_to_many
     
     # Returns the first object matching +conditions+, or the first object
     # if no conditions are specified

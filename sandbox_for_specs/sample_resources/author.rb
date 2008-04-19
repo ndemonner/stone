@@ -13,6 +13,7 @@ class Author #:nodoc:
   
   has_many :posts
   has_many :comments
+  habtm :groups
   
   def cap_name
     self.name = self.name.titlecase

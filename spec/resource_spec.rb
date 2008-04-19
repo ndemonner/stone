@@ -137,7 +137,7 @@ describe Stone::Resource do
     @post.author.should be_instance_of(Author)
   end
   
-  it "should retrieve children objects id has_many has been set" do
+  it "should retrieve children objects if has_many has been set" do
     @post = Post.new
     @post.title = "Stone is Awesome"
     @post.body = "Stone is awesome because..."
@@ -194,6 +194,26 @@ describe Stone::Resource do
   
   it "should only accept :asc or :desc for ordering" do
     lambda {Author.all(:created_at.lt => DateTime.now>>1, :order => {:created_at => :cool})}.should raise_error
+  end
+  
+  it "should work with many-to-many associations via habtm" do
+    author1 = Author.first
+    author2 = Author.all.last
+    group1 = Group.new(:name => "Group One")
+    group2 = Group.new(:name => "Group Two")
+    group1.save
+    group2.save
+    
+    author1.groups << group1
+    author1.groups << group2
+    group1.authors << author1
+    group1.authors << author2
+    
+    author1.save
+    group1.save
+    
+    author1.groups.size.should == 2
+    group1.authors.size.should == 2
   end
 
 end

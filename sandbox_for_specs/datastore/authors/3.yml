@@ -1,10 +1,12 @@
 --- !ruby/object:Author 
-created_at: 2008-04-18T17:08:59-07:00
+created_at: 2008-04-19T14:42:31-07:00
 email: weyo@something.com
 errors: !ruby/object:Validatable::Errors 
   errors: {}
 
-favorite_number: 12
+favorite_number: 46
+groups: []
+
 id: 3
 name: Mary Poppins
 times_validated_hash: 
