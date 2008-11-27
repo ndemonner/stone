@@ -39,8 +39,8 @@ module Stone
     # +cb_sym+:: Used to retrieve the methods to send
     # +obj+:: The object to which the retrieved methods are sent
     def fire(cb_sym, obj)
-      unless obj.class.to_s.make_key == :class
-        self[obj.class.to_s.make_key][cb_sym].each do |meth|
+      unless obj.model.make_key == :class
+        self[obj.model.make_key][cb_sym].each do |meth|
           obj.send(meth) unless meth.blank?
         end
       end
