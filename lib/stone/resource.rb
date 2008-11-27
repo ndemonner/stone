@@ -10,7 +10,9 @@ module Stone
   # end
   #
   module Resource
-    
+
+    attr_accessor :id
+
     class << self
       def included(base)
         rsrc_sym = base.to_s.make_key
@@ -42,7 +44,7 @@ module Stone
                   end
                 end
               end
-              @@fields[self.class.to_s.make_key].each do |f|
+              @@fields[self.model.make_key].each do |f|
                 instance_variable_set("@"+f[:name].to_s,[]) if f[:klass] == Array
               end
             end
@@ -107,14 +109,13 @@ module Stone
       end
     end # field
     
-    def id=(value)
-      @id = value
+    def model
+      self.class.to_s.downcase
     end
-    
-    def id
-      @id
+    def models
+      self.model.pluralize
     end
-    
+
     # Registers the given method with the current instance of Callbacks. Upon
     # activation (in this case, right before Resource.save is executed), the
     # +meth+ given is called against the object being, in this case, saved.
@@ -327,7 +328,7 @@ module Stone
     # Determines whether the field classes of a given object match the field
     # class declarations
     def fields_are_valid?
-      klass_sym = self.class.to_s.make_key
+      klass_sym = self.model.make_key
       @@fields[klass_sym].each do |field|
         unless self.send(field[:name]).class == field[:klass] || self.send(field[:name]) == nil || self.already_exists?
           return false 
@@ -368,7 +369,7 @@ module Stone
       obj.created_at = DateTime.now if field_declared?(:created_at,obj.class)
       obj.updated_at = DateTime.now if field_declared?(:updated_at,obj.class)
       DataStore.write_yaml(obj)
-      @@store.resources[obj.class.to_s.make_key] << [obj.id, obj]
+      @@store.resources[obj.model.make_key] << [obj.id, obj]
       fire(:after_create)
     end
     
@@ -379,7 +380,7 @@ module Stone
     def put(obj)
       obj.updated_at = DateTime.now if field_declared?(:updated_at,obj.class)
       DataStore.write_yaml(obj)
-      @@store.resources[obj.class.to_s.make_key].each do |o|
+      @@store.resources[obj.model.make_key].each do |o|
         o[1] = obj if o[0] == obj.id
       end
       true

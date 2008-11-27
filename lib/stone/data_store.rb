@@ -3,17 +3,8 @@ module Stone
   class DataStore
     
     class << self
-      @dir ||= ""
-      
-      def local_dir=(value) #:nodoc:
-        @dir = value
-      end
+      attr_accessor :local_dir
 
-      # Provides the directory path to the local (app-specific) datastore
-      def local_dir
-        @dir || Dir.pwd/"datastore"
-      end
-      
       # Loads yaml files specific to the resource represented by +sym+
       # === Parameters
       # +sym+::
@@ -39,7 +30,7 @@ module Stone
       # +store+:: 
       #   DataStore object
       def determine_save_method(obj, store)
-        store.resources[obj.class.to_s.make_key].each do |o|
+        store.resources[obj.model.make_key].each do |o|
           return :put if o[0] == obj.id
         end
         :post
@@ -49,7 +40,7 @@ module Stone
       # === Parameters
       # +obj+:: The object to be persisted
       def write_yaml(obj)
-        path = self.local_dir/obj.class.to_s.downcase.pluralize/"#{obj.id}.yml"
+        path = self.local_dir/obj.models/"#{obj.id}.yml"
         File.open(path, 'w') do |out|
           YAML.dump(obj, out)
         end
