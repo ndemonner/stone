@@ -10,8 +10,7 @@ module Stone
       # +sym+::
       #   Symbol representing resource data to load
       def load_data(sym)
-        dir = self.local_dir
-        ymls = Dir.glob(dir/sym.to_s.pluralize/"*.yml")
+        ymls = Dir.glob(self.local_dir/sym.to_s.pluralize/"*.yml").sort { |a,b| File.basename(a,".yml").to_i - File.basename(b,".yml").to_i }
         objs = []
         unless ymls.empty?
           ymls.each do |yml|
