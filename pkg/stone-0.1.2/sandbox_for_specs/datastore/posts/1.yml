@@ -1,8 +1,0 @@
---- !ruby/object:Post 
-author_id: 1
-body: Stone is cool because...
-errors: !ruby/object:Validatable::Errors 
-  errors: {}
-
-id: 1
-title: Stone is Cool
