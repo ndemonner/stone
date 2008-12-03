@@ -33,7 +33,7 @@ module Stone
       DataStore.local_dir = path/"datastore"
 
       # create the datastore dir unless it exists
-      FileUtils.mkdir(DataStore.local_dir) unless File.exists?(DataStore.local_dir)
+      FileUtils.mkdir_p(DataStore.local_dir) unless File.exists?(DataStore.local_dir)
 
       # create a .stone_metadata that contains the resource locations
       # for Stone::Utilities to use
@@ -46,7 +46,7 @@ module Stone
         require resource unless framework == :merb || framework == :rails
         name = File.basename(resource,".rb").pluralize
         unless File.exists? DataStore.local_dir/name
-          FileUtils.mkdir(DataStore.local_dir/name)
+          FileUtils.mkdir_p(DataStore.local_dir/name)
         end
       end
     end
