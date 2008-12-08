@@ -34,31 +34,23 @@ module Stone
             def initialize(hash = nil)
               self.id = self.next_id_for_klass(self.class)
               unless hash.blank?
-                hash.each_key do |k|
-                  if hash[k].is_a? Hash
-                    hash[k].each do |k,v|
-                      self.send(k.to_s+"=",v)
-                    end
-                  else
-                    self.send(k.to_s+"=", hash[k])
-                  end
-                end
+                update_attributes(hash)
               end
               @@fields[self.model.make_key].each do |f|
                 instance_variable_set("@"+f[:name].to_s,[]) if f[:klass] == Array
               end
             end
-            
+
             def to_s
               id
             end
-            
+
             def [](sym)
               self.send(sym)
             end
           EOS
         end
-        
+
         unless @@store.resources.include?(rsrc_sym)
           @@store.resources[rsrc_sym] = DataStore.load_data(rsrc_sym)
         end
@@ -291,12 +283,13 @@ module Stone
     # +hash+:: the attributes to change
     def update_attributes(hash)
       hash.each_key do |k|
+        k = k.to_sym
         if hash[k].is_a? Hash
           hash[k].each do |k,v|
-            self.send(k.to_s+"=",v)
+            self.send(k.to_s+"=",v) if field_declared?(k,self.class)
           end
         else
-          self.send(k.to_s+"=", hash[k])
+          self.send(k.to_s+"=", hash[k]) if field_declared?(k,self.class)
         end
       end
       self.save
