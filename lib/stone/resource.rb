@@ -285,9 +285,7 @@ module Stone
       hash.each_key do |k|
         k = k.to_sym
         if hash[k].is_a? Hash
-          hash[k].each do |k,v|
-            self.send(k.to_s+"=",v) if field_declared?(k,self.class)
-          end
+          update_attributes(hash[k])
         else
           self.send(k.to_s+"=", hash[k]) if field_declared?(k,self.class)
         end
