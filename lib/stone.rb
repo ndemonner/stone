@@ -7,6 +7,7 @@ require 'yaml'
 
 require File.expand_path(File.dirname(__FILE__) + '/stone/core_ext/string')
 require File.expand_path(File.dirname(__FILE__) + '/stone/core_ext/symbol')
+require File.expand_path(File.dirname(__FILE__) + '/stone/core_ext/datetime')
 require File.expand_path(File.dirname(__FILE__) + '/stone/query')
 require File.expand_path(File.dirname(__FILE__) + '/stone/data_store')
 require File.expand_path(File.dirname(__FILE__) + '/stone/callbacks')
