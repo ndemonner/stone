@@ -150,21 +150,29 @@ describe Stone::Resource do
   it "should accept Resource.new(hash) form" do
     @author = Author.new(:name => "Ron DeMonner", :email => "ron@cladby.com")
     @author.should be_valid
+    Author.delete(@author.id)
   end
-  
+
+  it "should accept Resource.new(hash) with more parameters than defined on the model" do
+    @author = Author.new(:name => "Ron DeMonner", :email => "ron@cladby.com", :hair_color => "brown")
+    @author.should be_valid
+    Author.delete(@author.id)
+  end
+
   it "should accept Resource.new(params[:resource]) form" do
     params = {}
     params[:author] = {:name => "Ron DeMonner", :email => "ron@cladby.com"}
     @author = Author.new(params[:author])
     @author.should be_valid
+    Author.delete(@author.id)
   end
-  
+
   it "should accept Resource.update_attributes(hash)" do
     params = {}
     params[:author] = {:name => "Ron DeMonner", :email => "ron@cladby.com"}
-    
+
     plain_hash = {:name => "Nick DeMonner", :email => "nick@cladby.com"}
-    
+
     author = Author.first(:name => "Nick DeMonner")
     author.update_attributes(params[:author]).should be_true
     author.update_attributes(plain_hash).should be_true
