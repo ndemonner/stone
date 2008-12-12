@@ -6,4 +6,8 @@ class String #:nodoc:
   def make_key
     self.downcase.to_sym
   end
+  # From Ruby Facets
+  def titlecase
+    gsub(/\b\w/){$&.upcase}
+  end
 end
