@@ -3,6 +3,7 @@
 require "rake"
 require 'fileutils'
 require "rake/clean"
+require 'rake/gempackagetask'
 require "spec/rake/spectask"
 require 'lib/stone'
 
@@ -29,3 +30,7 @@ task :github do
   Thread.new { github_spec = eval("$SAFE = 3\n#{data}") }.join
   puts github_spec
 end
+
+CLOBBER.include [ 'pkg' ]
+load 'stone.gemspec'
+Rake::GemPackageTask.new(@spec) { |task| }

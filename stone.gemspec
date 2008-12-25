@@ -1,4 +1,4 @@
-Gem::Specification.new do |s|
+@spec = Gem::Specification.new do |s|
   s.name                  = 'stone'
   s.version               = '0.2'
   s.platform              = Gem::Platform::RUBY
