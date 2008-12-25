@@ -348,7 +348,7 @@ module Stone
       self.class.all(order_by.gt => self.send(order_by), :order => {order_by => :asc})[0]
     end
     def prev(order_by = :id)
-      self.class.all(order_by.lt => self.send(order_by), :order => {order_by => :asc})[0]
+      self.class.all(order_by.lt => self.send(order_by), :order => {order_by => :desc})[0]
     end
 
     private
