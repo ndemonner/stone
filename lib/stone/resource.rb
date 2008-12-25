@@ -1,11 +1,10 @@
 module Stone
-  
   # Adds the ability to persist any class it is included in
   # === Example
   #
   # class Post
   #   include Stone::Resource
-  #   
+  # 
   #   field :body, String
   # end
   #
@@ -16,22 +15,22 @@ module Stone
     class << self
       def included(base)
         rsrc_sym = base.to_s.make_key
-        
+
         @@callbacks ||= Callbacks.new
         @@callbacks.register_klass(base)
-        
+
         @@store ||= DataStore.new
-        
+
         base.send(:extend, self)
         base.send(:include, ::Validatable)
-        
+
         # rspec breaks if its classes have their contructor overwritten
         unless base.to_s.downcase =~ /(spec::example::examplegroup::subclass_\d|blah)/
           # allow object to be created with a hash of attributes...
           # [] allows for obj[attribute] retrieval
           # to_s allows for stupid Rails to work
           base.class_eval <<-EOS, __FILE__, __LINE__
-            def initialize(hash = nil)
+            def initialize(hash = {})
               self.id = self.next_id_for_klass(self.class)
               unless hash.blank?
                 update_attributes(hash)
@@ -87,18 +86,23 @@ module Stone
           def #{name}
             @#{name}
           end
-        
           def #{name}=(value)
             @#{name} = value
           end
         EOS
       else
-        self.class_eval <<-EOS, __FILE__, __LINE__          
+        self.class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
             @#{name}
           end
         EOS
       end
+      self.send(:define_method,"next_by_#{name}") {
+        self.next(:"#{name}")
+      }
+      self.send(:define_method,"prev_by_#{name}") {
+        self.prev(:"#{name}")
+      }
     end # field
 
     def model
@@ -276,7 +280,7 @@ module Stone
       end
       nil
     end
-    
+
     # Puts the attribute changes in +hash+
     # === Parameters
     # +hash+:: the attributes to change
@@ -291,7 +295,7 @@ module Stone
       end
       self.save
     end
-    
+
     # Determine the next id number to use based on the last stored object's id
     # of class +klass+
     # === Parameters
@@ -329,19 +333,26 @@ module Stone
       end
       true
     end
-    
+
     # Needed for Rails to work
     def new_record?
       !already_exists?
     end
-    
+
     # Finds out if the object is already in the current DataStore instance
     def already_exists?
       DataStore.determine_save_method(self, @@store) == :put
     end
-    
+
+    def next(order_by = :id)
+      self.class.all(order_by.gt => self.send(order_by), :order => {order_by => :asc})[0]
+    end
+    def prev(order_by = :id)
+      self.class.all(order_by.lt => self.send(order_by), :order => {order_by => :asc})[0]
+    end
+
     private
-    
+
     # Fires the given callback in the current instance of Callbacks
     # === Parameters
     # +cb_sym+:: The symbol for the callback (e.g. :before_save)
@@ -384,7 +395,7 @@ module Stone
     #   DataStore instance
     def find(conditions, key) #:doc:
       objs = []
-    
+
       if conditions.is_a? Hash
         unless conditions.to_a.flatten.map {|e| e.is_a? Query}.include?(true)
           conds = conditions.to_a.flatten
