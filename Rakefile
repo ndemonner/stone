@@ -1,5 +1,5 @@
-require 'config/requirements'
-require 'config/hoe' # setup Hoe + all gem configuration
+# require 'config/requirements'
+# require 'config/hoe' # setup Hoe + all gem configuration
 require "rake"
 require 'fileutils'
 require "rake/clean"
@@ -19,4 +19,13 @@ task :ok do
   FileUtils.rm(Dir.pwd/"sandbox_for_specs"/"stone.sql") \
     if File.exists? Dir.pwd/"sandbox_for_specs"/"stone.sql"
   sh "rake specs"
+end
+
+desc "Check if gem will work in Github"
+task :github do
+  require 'rubygems/specification'
+  data = File.read('stone.gemspec')
+  github_spec = nil
+  Thread.new { github_spec = eval("$SAFE = 3\n#{data}") }.join
+  puts github_spec
 end
