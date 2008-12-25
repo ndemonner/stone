@@ -29,7 +29,7 @@ module Stone
       # +store+:: 
       #   DataStore object
       def determine_save_method(obj, store)
-        store.resources[obj.model.make_key].each do |o|
+        store.resources[obj.model].each do |o|
           return :put if o[0] == obj.id
         end
         :post
