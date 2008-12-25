@@ -35,9 +35,9 @@ module Stone
       elsif arg.is_a? Regexp
         "#{self.field}#{self.op}(#{arg.inspect})"
       elsif arg.is_a? Date
-        "#{self.field}#{self.op}(DateTime.parse(\"#{arg}\"))"
+        "#{self.field}#{self.op}(DateTime.parse('#{arg}'))"
       else
-        "#{self.field}#{self.op}(#{arg})"        
+        "#{self.field}#{self.op}(#{arg})"
       end
     end
   end 

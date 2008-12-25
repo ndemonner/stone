@@ -234,15 +234,22 @@ describe Stone::Resource do
     Post.delete(post_two.id)
   end
 
-  it "should return a previous and next record by field name" do
+  it "should return a previous record by field name" do
     post_one = Post.new( :title => "First Post", :body => "Bar" )
+    sleep(2)
     post_two = Post.new( :title => "After First Post", :body => "Bar" )
-    post_three = Post.new( :title => "Wadus", :body => "Bar" )
     post_one.prev_by_title.should == post_two
-    post_one.next_by_title.should == post_three
+    post_two.prev_by_created_at.should == post_one
+    Post.delete(post_one.id)
+    Post.delete(post_two.id)
+  end
+  it "should return a next record by field name" do
+    post_one = Post.new( :title => "First Post", :body => "Bar" )
+    sleep(2)
+    post_two = Post.new( :title => "After First Post", :body => "Bar" )
+    post_one.next_by_created_at.should == post_two
     post_two.next_by_title.should == post_one
     Post.delete(post_one.id)
     Post.delete(post_two.id)
-    Post.delete(post_three.id)
   end
 end
