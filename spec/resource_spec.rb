@@ -64,6 +64,12 @@ describe Stone::Resource do
     person.name.should == "Mary Poppins"
   end
 
+  it "should find and return an object using find_by_id" do
+    Post.new( :title => "First Post", :body => "Bar" )
+    post = Post.find_by_id(1)
+    post.id.should == 1
+  end
+
   it "should accept Resource.find(hash) form" do
     author = Author.first(:name => "Nick DeMonner")
     author.should be_instance_of(Author)
@@ -243,6 +249,7 @@ describe Stone::Resource do
     Post.delete(post_one.id)
     Post.delete(post_two.id)
   end
+
   it "should return a next record by field name" do
     post_one = Post.new( :title => "First Post", :body => "Bar" )
     sleep(2)
@@ -252,4 +259,5 @@ describe Stone::Resource do
     Post.delete(post_one.id)
     Post.delete(post_two.id)
   end
+
 end

@@ -280,6 +280,7 @@ module Stone
       end
       nil
     end
+    alias_method :find_by_id, :get
 
     # Puts the attribute changes in +hash+
     # === Parameters
