@@ -98,10 +98,10 @@ module Stone
         EOS
       end
       self.send(:define_method,"next_by_#{name}") {
-        self.next(:"#{name}")
+        self.next(name.to_sym)
       }
       self.send(:define_method,"prev_by_#{name}") {
-        self.prev(:"#{name}")
+        self.prev(name.to_sym)
       }
     end # field
 
