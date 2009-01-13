@@ -32,9 +32,7 @@ module Stone
           base.class_eval <<-EOS, __FILE__, __LINE__
             def initialize(hash = {})
               self.id = self.next_id_for_klass(self.class)
-              unless hash.blank?
-                update_attributes(hash)
-              end
+              update_attributes(hash)
               @@fields[self.model].each do |f|
                 instance_variable_set("@"+f[:name].to_s,[]) if f[:klass] == Array
               end
