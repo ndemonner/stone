@@ -19,4 +19,7 @@ class Symbol
   def not
     Stone::Query.new(self.to_s, :not)
   end
+  def blank?
+    return self.to_s.size <= 0
+  end
 end

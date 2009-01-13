@@ -4,6 +4,7 @@ require 'validatable'
 require 'english/inflect'
 require 'yaml'
 
+require File.expand_path(File.dirname(__FILE__) + '/stone/core_ext/enumerable')
 require File.expand_path(File.dirname(__FILE__) + '/stone/core_ext/string')
 require File.expand_path(File.dirname(__FILE__) + '/stone/core_ext/symbol')
 require File.expand_path(File.dirname(__FILE__) + '/stone/core_ext/datetime')
