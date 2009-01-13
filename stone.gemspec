@@ -1,4 +1,4 @@
-@spec = Gem::Specification.new do |s|
+Gem::Specification.new do |s|
   s.name                  = 'stone'
   s.version               = '0.2'
   s.platform              = Gem::Platform::RUBY
@@ -19,6 +19,7 @@
     "lib/stone/resource.rb",
     "lib/stone/version.rb",
     "lib/stone/core_ext/datetime.rb",
+    "lib/stone/core_ext/enumerable.rb",
     "lib/stone/core_ext/string.rb",
     "lib/stone/core_ext/symbol.rb"
   ]
