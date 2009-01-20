@@ -1,75 +1,68 @@
 module Stone
-  
   # Adds the ability to persist any class it is included in
   # === Example
   #
   # class Post
   #   include Stone::Resource
-  #   
+  # 
   #   field :body, String
   # end
   #
   module Resource
-    
+
+    attr_accessor :id
+
     class << self
       def included(base)
         rsrc_sym = base.to_s.make_key
-        
+
         @@callbacks ||= Callbacks.new
         @@callbacks.register_klass(base)
-        
+
         @@store ||= DataStore.new
-        
+
         base.send(:extend, self)
         base.send(:include, ::Validatable)
-        
+
         # rspec breaks if its classes have their contructor overwritten
         unless base.to_s.downcase =~ /(spec::example::examplegroup::subclass_\d|blah)/
           # allow object to be created with a hash of attributes...
           # [] allows for obj[attribute] retrieval
           # to_s allows for stupid Rails to work
           base.class_eval <<-EOS, __FILE__, __LINE__
-            def initialize(hash = nil)
+            def initialize(hash = {})
               self.id = self.next_id_for_klass(self.class)
               unless hash.blank?
-                hash.each_key do |k|
-                  if hash[k].is_a? Hash
-                    hash[k].each do |k,v|
-                      self.send(k.to_s+"=",v)
-                    end
-                  else
-                    self.send(k.to_s+"=", hash[k])
-                  end
-                end
+                update_attributes(hash)
               end
-              @@fields[self.class.to_s.make_key].each do |f|
+              @@fields[self.model].each do |f|
                 instance_variable_set("@"+f[:name].to_s,[]) if f[:klass] == Array
               end
             end
-            
+
             def to_s
               id
             end
-            
+
             def [](sym)
               self.send(sym)
             end
           EOS
         end
-        
+
         unless @@store.resources.include?(rsrc_sym)
           @@store.resources[rsrc_sym] = DataStore.load_data(rsrc_sym)
         end
       end
     end # self
-    
+
     @@fields = {}
-    
+
     # Adds a given field to @@fields and inserts an accessor for that
     # field into klass
     # === Parameters
     # +name+<String>::
-    #    
+    #
     def field(name, klass, arg = nil)
       if arg && arg[:unique] == true
         unique = true
@@ -93,28 +86,32 @@ module Stone
           def #{name}
             @#{name}
           end
-        
           def #{name}=(value)
             @#{name} = value
           end
         EOS
       else
-        self.class_eval <<-EOS, __FILE__, __LINE__          
+        self.class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
             @#{name}
           end
         EOS
       end
+      self.send(:define_method,"next_by_#{name}") {
+        self.next(name.to_sym)
+      }
+      self.send(:define_method,"prev_by_#{name}") {
+        self.prev(name.to_sym)
+      }
     end # field
-    
-    def id=(value)
-      @id = value
+
+    def model
+      self.class.to_s.downcase.to_sym
     end
-    
-    def id
-      @id
+    def models
+      self.class.to_s.downcase.pluralize
     end
-    
+
     # Registers the given method with the current instance of Callbacks. Upon
     # activation (in this case, right before Resource.save is executed), the
     # +meth+ given is called against the object being, in this case, saved.
@@ -126,33 +123,32 @@ module Stone
     def before_save(meth)
       @@callbacks.register(:before_save, meth, self)
     end
-    
+
     # See before_save
     def after_save(meth)
       @@callbacks.register(:after_save, meth, self)
     end
-    
-    
+
     # See before_save
     def before_create(meth)
       @@callbacks.register(:before_create, meth, self)
     end
-    
+
     # See before_save
     def after_create(meth)
       @@callbacks.register(:after_create, meth, self)
     end
-    
+
     # See before_save
     def before_delete(meth) 
       @@callbacks.register(:before_delete, meth, self)
     end
-    
+
     # See before_save
     def after_delete(meth)
       @@callbacks.register(:after_delete, meth, self)
     end
-    
+
     # Registers a one-to-many relationship for +resource+
     # === Parameters
     # +resource+::
@@ -164,7 +160,7 @@ module Stone
         end
       EOS
     end
-    
+
     # Registers a one-to-one relationship for +resource+
     # === Parameters
     # +resource+::
@@ -172,7 +168,7 @@ module Stone
     def has_one(resource, *args)
       field "#{resource.to_s}_id".to_sym, Fixnum
     end
-    
+
     # Registers a belongs_to association for +resource+
     # === Parameters
     # +resource+ :: The resource to which this class belongs
@@ -184,7 +180,7 @@ module Stone
         end
       EOS
     end
-    
+
     # Registers a many-to-many association using an array of +resource+
     # ids.
     # === Parameters
@@ -193,9 +189,9 @@ module Stone
     def has_and_belongs_to_many(resource, *args)
       field resource, Array
     end
-    
+
     alias_method :habtm, :has_and_belongs_to_many
-    
+
     # Returns the first object matching +conditions+, or the first object
     # if no conditions are specified
     # === Parameters
@@ -208,7 +204,7 @@ module Stone
         return find(conditions, self.to_s.make_key)[0]
       end
     end
-    
+
     # Returns all objects matching +conditions+, or all objects if no
     # conditions are specified
     # === Parameters
@@ -246,7 +242,7 @@ module Stone
       end
       objs
     end
-    
+
     # Synonymous for get
     # === Parameters
     # +id+:: id of the object to retrieve
@@ -255,11 +251,11 @@ module Stone
         unless id.class == Fixnum || id.to_i
       get(id)
     end
-    
+
     def fields
       @@fields
     end
-    
+
     # Deletes the object with +id+ from the current DataStore instance and
     # its corresponding yaml file
     def delete(id)
@@ -271,7 +267,7 @@ module Stone
       fire(:after_delete)
       true
     end
-    
+
     # Allow for retrieval of an object in the current DataStore instance by id
     # === Parameters
     # +id+:: id of the object to retrieve 
@@ -284,23 +280,23 @@ module Stone
       end
       nil
     end
-    
+    alias_method :find_by_id, :get
+
     # Puts the attribute changes in +hash+
     # === Parameters
     # +hash+:: the attributes to change
     def update_attributes(hash)
       hash.each_key do |k|
+        k = k.to_sym
         if hash[k].is_a? Hash
-          hash[k].each do |k,v|
-            self.send(k.to_s+"=",v)
-          end
+          update_attributes(hash[k])
         else
-          self.send(k.to_s+"=", hash[k])
+          self.send(k.to_s+"=", hash[k]) if field_declared?(k,self.class)
         end
       end
       self.save
     end
-    
+
     # Determine the next id number to use based on the last stored object's id
     # of class +klass+
     # === Parameters
@@ -313,7 +309,7 @@ module Stone
         return 1
       end
     end
-    
+
     # Save an object to the current DataStore instance.
     def save
       return false unless self.fields_are_valid?
@@ -323,11 +319,11 @@ module Stone
       self.class.send(sym, self)
       fire(:after_save)
     end
-    
+
     # Determines whether the field classes of a given object match the field
     # class declarations
     def fields_are_valid?
-      klass_sym = self.class.to_s.make_key
+      klass_sym = self.model
       @@fields[klass_sym].each do |field|
         unless self.send(field[:name]).class == field[:klass] || self.send(field[:name]) == nil || self.already_exists?
           return false 
@@ -338,19 +334,26 @@ module Stone
       end
       true
     end
-    
+
     # Needed for Rails to work
     def new_record?
       !already_exists?
     end
-    
+
     # Finds out if the object is already in the current DataStore instance
     def already_exists?
       DataStore.determine_save_method(self, @@store) == :put
     end
-    
+
+    def next(order_by = :id)
+      self.class.all(order_by.gt => self.send(order_by), :order => {order_by => :desc})[0]
+    end
+    def prev(order_by = :id)
+      self.class.all(order_by.lt => self.send(order_by), :order => {order_by => :desc})[0]
+    end
+
     private
-    
+
     # Fires the given callback in the current instance of Callbacks
     # === Parameters
     # +cb_sym+:: The symbol for the callback (e.g. :before_save)
@@ -358,7 +361,7 @@ module Stone
       @@callbacks.fire(cb_sym, self)
       true
     end
-    
+
     # Creates a yaml file for +obj+ and adds +obj+ to the current DataStore
     # instance
     # === Parameters
@@ -368,10 +371,10 @@ module Stone
       obj.created_at = DateTime.now if field_declared?(:created_at,obj.class)
       obj.updated_at = DateTime.now if field_declared?(:updated_at,obj.class)
       DataStore.write_yaml(obj)
-      @@store.resources[obj.class.to_s.make_key] << [obj.id, obj]
+      @@store.resources[obj.model] << [obj.id, obj]
       fire(:after_create)
     end
-    
+
     # Updates the yaml file for +obj+ and overwrites the old object in the
     # the current DataStore instance
     # === Parameters
@@ -379,12 +382,12 @@ module Stone
     def put(obj)
       obj.updated_at = DateTime.now if field_declared?(:updated_at,obj.class)
       DataStore.write_yaml(obj)
-      @@store.resources[obj.class.to_s.make_key].each do |o|
+      @@store.resources[obj.model].each do |o|
         o[1] = obj if o[0] == obj.id
       end
       true
     end
-    
+
     # Find an object according to +conditions+ provided
     # === Parameters
     # +conditions+:: A plain string representation of a set of conditions
@@ -393,7 +396,7 @@ module Stone
     #   DataStore instance
     def find(conditions, key) #:doc:
       objs = []
-    
+
       if conditions.is_a? Hash
         unless conditions.to_a.flatten.map {|e| e.is_a? Query}.include?(true)
           conds = conditions.to_a.flatten
@@ -411,7 +414,7 @@ module Stone
       end
       objs
     end
-    
+
     # Checks the list of fields for a given +klass+ to see if +field+
     # is included
     # === Parameters
@@ -423,7 +426,7 @@ module Stone
       end
       false
     end
-    
+
     # Executes and evaluates the expressions in +conds+ against 
     # the +obj+ provided, and then evaluates those results against
     # the conditionals ("&&") in +conds+
@@ -452,7 +455,7 @@ module Stone
       # evaluate the true/false array
       eval(tf_ary.join)
     end
-    
+
     # Turns conditions into a set of expressions that can be evaluated
     def parse_conditions(hash)
       conds = []
@@ -463,6 +466,7 @@ module Stone
       conds.pop
       conds
     end
+
   end # Resource
-  
+
 end # Stone

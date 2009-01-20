@@ -19,7 +19,6 @@ any application or framework. It is fast, and it is easy... it is good.
 == REQUIREMENTS:
 
 * English
-* Facets
 * Validatable
 
 == INSTALL:

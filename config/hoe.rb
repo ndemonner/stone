@@ -58,7 +58,7 @@ $hoe = Hoe.new(GEM_NAME, VERS) do |p|
   
   # == Optional
   p.changes = p.paragraphs_of("History.txt", 0..1).join("\n\n")
-  p.extra_deps = [['english', '>= 0.2.0'], ['validatable', '>= 1.6.7'], ['facets', '>= 2.4.1']]
+  p.extra_deps = [['english', '>= 0.2.0'], ['validatable', '>= 1.6.7']]
   
   #p.spec_extras = {}    # A hash of extra values to set in the gemspec.
   
