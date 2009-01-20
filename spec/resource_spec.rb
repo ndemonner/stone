@@ -29,6 +29,10 @@ describe Stone::Resource do
     @author.should_not be_valid
   end
   
+  it "should fail" do
+    (1 == 0).should be_true
+  end
+  
   it "should be invalid when a field's class does not match its declaration" do
     @author.name = 3
     @author.email = "nick@cladby.com"
