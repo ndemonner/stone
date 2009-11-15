@@ -1,5 +1,6 @@
 require "rubygems"
 
+require "stone/ext/fixnum"
 require "stone/resource"
 require "stone/serializer"
 require "stone/map"
