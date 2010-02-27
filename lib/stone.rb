@@ -22,11 +22,11 @@ module Stone
       @compatibility ||= []
       @serializer ||= Stone::Serializer::YAML.new
       
-      @map = Stone::Map.new
+      @map = Stone::Map.new(Stone.db)
     end
     
     def teardown!
-      @db.rmdir
+      @db.rmtree
       @db, @serializer, @map, @compatibility = nil
     end
   end

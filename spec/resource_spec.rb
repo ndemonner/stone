@@ -8,9 +8,15 @@ describe Stone::Resource do
     
     class Car
       include Stone::Resource
+      storage_mode :memory
 
       field :year
       field :name
+      validate :name do |name|
+        name.is_a? String
+        !name.nil?
+      end
+      
       field :color
       validate :color do |color|
         color.is_a? String
@@ -24,7 +30,8 @@ describe Stone::Resource do
 
     class Manufacturer
       include Stone::Resource
-
+      storage_mode :file
+      
       field :name
 
       # has many Cars
@@ -33,6 +40,7 @@ describe Stone::Resource do
 
     class Buyer
       include Stone::Resource
+      storage_mode :memory
 
       field :first_name      
       field :last_name
@@ -43,6 +51,7 @@ describe Stone::Resource do
 
     class Package
       include Stone::Resource
+      storage_mode :file
 
       field :leather_interior
       field :wheel_type
@@ -59,6 +68,18 @@ describe Stone::Resource do
   it "should initialize a Resource correctly" do
     Car.new.year.should be_nil
     Car.new(:year => 1984).year.should equal(1984)
+  end
+  
+  it "should be valid if it meets all validations" do
+    Car.new(:year => 1984, :color => "white", :name => "Taurus").should be_valid
+    Car.new(:year => 1984, :color => "blue").should_not be_valid
+  end
+  
+  it "should properly serialize a save or create" do
+    car = Car.new(:year => 1984, :color => "white", :name => "Taurus")
+    car.save.should be_true
+    
+    YAML.load_file("#{Stone.db}/Car/1.yml").color.should match("white")
   end
   
   after(:all) do
