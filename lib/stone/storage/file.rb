@@ -1,6 +1,6 @@
 module Stone
-  module Serializer
-    class JSON
+  module Storage
+    class File
       
     end
   end

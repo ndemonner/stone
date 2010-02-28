@@ -1,0 +1,1 @@
+require "stone/storage/file"

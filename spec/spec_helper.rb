@@ -5,6 +5,11 @@ require 'stone'
 require 'spec'
 require 'spec/autorun'
 
-Spec::Runner.configure do |config|
-  
-end
+require 'models/student'
+require 'models/teacher'
+require 'models/essay'
+require 'models/grade'
+
+Stone.storage = Stone::Storage::File
+Stone.location = File.dirname(__FILE__) + "/"
+Stone.serializer = Stone::Serializers::Yaml

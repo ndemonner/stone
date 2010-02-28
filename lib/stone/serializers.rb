@@ -1,0 +1,1 @@
+require "stone/serializers/yaml"
